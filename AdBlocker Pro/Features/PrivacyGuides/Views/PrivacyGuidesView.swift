@@ -33,7 +33,10 @@ struct PrivacyGuidesView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Privacy Guides")
+            .scrollContentBackground(.hidden)
+            .background(AppTheme.groupedBackground)
+            .navigationTitle(String(localized: "Privacy Guides"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }

@@ -21,7 +21,10 @@ struct SettingsView: View {
                 aboutSection
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Settings")
+            .scrollContentBackground(.hidden)
+            .background(AppTheme.groupedBackground)
+            .navigationTitle(String(localized: "Settings"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }

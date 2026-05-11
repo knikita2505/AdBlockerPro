@@ -8,25 +8,25 @@ struct OnboardingView: View {
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             icon: "shield.checkered",
-            iconColor: .green,
+            iconColor: AppTheme.accent,
             title: String(localized: "Block Ads in Safari"),
             subtitle: String(localized: "Remove annoying ads, banners and pop-ups from websites you visit in Safari")
         ),
         OnboardingPage(
             icon: "eye.slash.fill",
-            iconColor: .blue,
+            iconColor: AppTheme.accent,
             title: String(localized: "Stop Trackers"),
             subtitle: String(localized: "Prevent websites and advertisers from tracking your online activity")
         ),
         OnboardingPage(
             icon: "xmark.rectangle.fill",
-            iconColor: .orange,
+            iconColor: AppTheme.accent,
             title: String(localized: "Hide Cookie Banners"),
             subtitle: String(localized: "Automatically dismiss cookie consent pop-ups for a cleaner browsing experience")
         ),
         OnboardingPage(
             icon: "lock.shield.fill",
-            iconColor: .green,
+            iconColor: AppTheme.accent,
             title: String(localized: "Privacy Tools"),
             subtitle: String(localized: "Network privacy check, secure password generator and privacy guides — all in one app")
         )

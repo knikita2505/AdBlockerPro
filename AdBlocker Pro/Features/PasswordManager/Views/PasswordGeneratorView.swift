@@ -11,83 +11,110 @@ struct PasswordGeneratorSection: View {
     @State private var showCopiedToast = false
 
     var body: some View {
-        Section {
+        VStack(spacing: AppTheme.spacingM) {
+            // Password Display
             VStack(spacing: AppTheme.spacingM) {
                 Text(generatedPassword.isEmpty ? "Tap Generate" : generatedPassword)
-                    .font(.system(size: 20, weight: .medium, design: .monospaced))
+                    .font(.system(size: 18, weight: .medium, design: .monospaced))
                     .foregroundStyle(generatedPassword.isEmpty ? AppTheme.tertiaryText : AppTheme.primaryText)
                     .frame(maxWidth: .infinity)
                     .padding(AppTheme.spacingM)
-                    .background(AppTheme.tertiaryBackground)
+                    .background(AppTheme.groupedBackground)
                     .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusS))
                     .textSelection(.enabled)
 
-                HStack(spacing: AppTheme.spacingM) {
+                HStack(spacing: AppTheme.spacingS) {
                     Button {
                         generatePassword()
                     } label: {
-                        Label("Generate", systemImage: "arrow.clockwise")
-                            .font(AppTheme.headlineFont)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(AppTheme.accent)
-                            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusS))
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.clockwise")
+                            Text(String(localized: "Generate"))
+                        }
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(AppTheme.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusS))
                     }
 
                     Button {
                         copyPassword()
                     } label: {
-                        Label("Copy", systemImage: "doc.on.doc")
-                            .font(AppTheme.headlineFont)
-                            .foregroundStyle(AppTheme.accent)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(AppTheme.accent.opacity(0.12))
-                            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusS))
+                        HStack(spacing: 6) {
+                            Image(systemName: "doc.on.doc")
+                            Text(String(localized: "Copy"))
+                        }
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppTheme.accent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(AppTheme.accent.opacity(0.10))
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusS))
                     }
                     .disabled(generatedPassword.isEmpty)
                 }
             }
-            .padding(.vertical, AppTheme.spacingXS)
-        } header: {
-            Text("Generated Password")
-        }
+            .padding(AppTheme.spacingM)
+            .background(AppTheme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
 
-        Section("Options") {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("Length")
-                    Spacer()
-                    Text("\(Int(passwordLength))")
-                        .foregroundStyle(AppTheme.accent)
-                        .font(AppTheme.headlineFont)
+            // Options
+            VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(String(localized: "Length"))
+                            .font(AppTheme.bodyFont)
+                        Spacer()
+                        Text("\(Int(passwordLength))")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(AppTheme.accent)
+                    }
+                    Slider(value: $passwordLength, in: 8...40, step: 1)
+                        .tint(AppTheme.accent)
                 }
-                Slider(value: $passwordLength, in: 8...40, step: 1)
-                    .tint(AppTheme.accent)
+                .padding(.horizontal, AppTheme.spacingM)
+                .padding(.vertical, 12)
+
+                Divider().padding(.leading, AppTheme.spacingM)
+
+                toggleRow(String(localized: "Uppercase (A-Z)"), isOn: $includeUppercase)
+                Divider().padding(.leading, AppTheme.spacingM)
+                toggleRow(String(localized: "Lowercase (a-z)"), isOn: $includeLowercase)
+                Divider().padding(.leading, AppTheme.spacingM)
+                toggleRow(String(localized: "Numbers (0-9)"), isOn: $includeNumbers)
+                Divider().padding(.leading, AppTheme.spacingM)
+                toggleRow(String(localized: "Special (!@#$%)"), isOn: $includeSpecialChars)
             }
+            .background(AppTheme.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
 
-            Toggle("Uppercase (A-Z)", isOn: $includeUppercase)
-                .tint(AppTheme.accent)
-            Toggle("Lowercase (a-z)", isOn: $includeLowercase)
-                .tint(AppTheme.accent)
-            Toggle("Numbers (0-9)", isOn: $includeNumbers)
-                .tint(AppTheme.accent)
-            Toggle("Special (!@#$%)", isOn: $includeSpecialChars)
-                .tint(AppTheme.accent)
-        }
-
-        if showCopiedToast {
-            Section {
-                HStack {
+            if showCopiedToast {
+                HStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(AppTheme.accent)
-                    Text("Password copied to clipboard")
+                    Text(String(localized: "Password copied to clipboard"))
                         .font(AppTheme.captionFont)
                         .foregroundStyle(AppTheme.accent)
                 }
+                .padding(AppTheme.spacingM)
+                .frame(maxWidth: .infinity)
+                .background(AppTheme.accent.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusS))
+                .transition(.opacity)
             }
         }
+    }
+
+    private func toggleRow(_ title: String, isOn: Binding<Bool>) -> some View {
+        Toggle(isOn: isOn) {
+            Text(title)
+                .font(AppTheme.bodyFont)
+        }
+        .tint(AppTheme.accent)
+        .padding(.horizontal, AppTheme.spacingM)
+        .padding(.vertical, 10)
     }
 
     private func generatePassword() {
@@ -123,8 +150,9 @@ struct PasswordGeneratorSection: View {
 }
 
 #Preview {
-    List {
+    ScrollView {
         PasswordGeneratorSection()
+            .padding()
     }
-    .listStyle(.insetGrouped)
+    .background(AppTheme.groupedBackground)
 }

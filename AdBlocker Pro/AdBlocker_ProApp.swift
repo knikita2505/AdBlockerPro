@@ -30,6 +30,7 @@ struct AdBlocker_ProApp: App {
             }
             .environment(appState)
             .environment(subscriptionManager)
+            .preferredColorScheme(.light)
             .onAppear {
                 subscriptionManager.checkSubscriptionStatus()
             }
@@ -46,11 +47,16 @@ struct AdBlocker_ProApp: App {
         #if os(iOS)
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithDefaultBackground()
+        tabBarAppearance.backgroundColor = .white
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        UITabBar.appearance().standardAppearance = tabBarAppearance
 
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithDefaultBackground()
+        navBarAppearance.backgroundColor = .white
+        navBarAppearance.shadowColor = UIColor(white: 0.92, alpha: 1)
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+        UINavigationBar.appearance().standardAppearance = navBarAppearance
         #endif
     }
 }

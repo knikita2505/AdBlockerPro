@@ -6,62 +6,76 @@ struct SavedPasswordsSection: View {
     @State private var showAddSheet = false
 
     var body: some View {
-        Section {
-            if storage.entries.isEmpty {
-                HStack {
-                    Spacer()
-                    VStack(spacing: AppTheme.spacingS) {
-                        Image(systemName: "key")
-                            .font(.system(size: 40))
-                            .foregroundStyle(AppTheme.secondaryText)
-                        Text("No saved passwords")
-                            .font(AppTheme.captionFont)
-                            .foregroundStyle(AppTheme.secondaryText)
-                        Text("Tap + to add your first entry")
-                            .font(AppTheme.captionFont)
-                            .foregroundStyle(AppTheme.tertiaryText)
-                    }
-                    .padding(.vertical, AppTheme.spacingXL)
-                    Spacer()
+        VStack(spacing: AppTheme.spacingM) {
+            HStack {
+                Text(String(localized: "Saved Passwords (\(storage.entries.count))"))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .textCase(.uppercase)
+                Spacer()
+                Button { showAddSheet = true } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(AppTheme.accent)
                 }
+            }
+            .padding(.horizontal, 4)
+
+            if storage.entries.isEmpty {
+                VStack(spacing: AppTheme.spacingS) {
+                    Image(systemName: "key")
+                        .font(.system(size: 36))
+                        .foregroundStyle(AppTheme.tertiaryText)
+                    Text(String(localized: "No saved passwords"))
+                        .font(AppTheme.captionFont)
+                        .foregroundStyle(AppTheme.secondaryText)
+                    Text(String(localized: "Tap + to add your first entry"))
+                        .font(AppTheme.captionFont)
+                        .foregroundStyle(AppTheme.tertiaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppTheme.spacingXL)
+                .background(AppTheme.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
             } else {
-                ForEach(storage.entries) { entry in
-                    NavigationLink {
-                        PasswordDetailView(entry: entry)
-                    } label: {
-                        HStack(spacing: AppTheme.spacingM) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(AppTheme.accent.opacity(0.12))
-                                    .frame(width: 40, height: 40)
-                                Text(entry.title.prefix(1).uppercased())
-                                    .font(.headline)
-                                    .foregroundStyle(AppTheme.accent)
+                VStack(spacing: 0) {
+                    ForEach(Array(storage.entries.enumerated()), id: \.element.id) { index, entry in
+                        NavigationLink {
+                            PasswordDetailView(entry: entry)
+                        } label: {
+                            HStack(spacing: AppTheme.spacingM) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(AppTheme.accent.opacity(0.10))
+                                        .frame(width: 42, height: 42)
+                                    Text(entry.title.prefix(1).uppercased())
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(AppTheme.accent)
+                                }
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(entry.title)
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundStyle(AppTheme.primaryText)
+                                    Text(entry.username)
+                                        .font(AppTheme.captionFont)
+                                        .foregroundStyle(AppTheme.secondaryText)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(AppTheme.tertiaryText)
                             }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(entry.title)
-                                    .font(AppTheme.bodyFont)
-                                Text(entry.username)
-                                    .font(AppTheme.captionFont)
-                                    .foregroundStyle(AppTheme.secondaryText)
-                            }
+                            .padding(.horizontal, AppTheme.spacingM)
+                            .padding(.vertical, 12)
+                        }
+
+                        if index < storage.entries.count - 1 {
+                            Divider().padding(.leading, 72)
                         }
                     }
                 }
-                .onDelete { offsets in
-                    storage.deleteEntries(at: offsets)
-                }
-            }
-        } header: {
-            HStack {
-                Text("Saved Passwords (\(storage.entries.count))")
-                Spacer()
-                Button {
-                    showAddSheet = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(AppTheme.accent)
-                }
+                .background(AppTheme.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
             }
         }
         .sheet(isPresented: $showAddSheet) {
@@ -93,7 +107,7 @@ struct PasswordEditView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Details") {
+                Section(String(localized: "Details")) {
                     TextField("Title (e.g. Google)", text: $title)
                     TextField("Website (e.g. google.com)", text: $website)
                         .textContentType(.URL)
@@ -106,7 +120,7 @@ struct PasswordEditView: View {
                         .textInputAutocapitalization(.never)
                 }
 
-                Section("Password") {
+                Section(String(localized: "Password")) {
                     HStack {
                         if showPassword {
                             TextField("Password", text: $password)
@@ -126,14 +140,16 @@ struct PasswordEditView: View {
                     }
                 }
             }
-            .navigationTitle(isEditing ? "Edit Password" : "Add Password")
+            .scrollContentBackground(.hidden)
+            .background(AppTheme.groupedBackground)
+            .navigationTitle(isEditing ? String(localized: "Edit Password") : String(localized: "Add Password"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(String(localized: "Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
+                    Button(String(localized: "Save")) { save() }
                         .disabled(title.isEmpty || password.isEmpty)
                 }
             }
@@ -178,9 +194,10 @@ struct PasswordEditView: View {
 
 #Preview {
     NavigationStack {
-        List {
+        ScrollView {
             SavedPasswordsSection()
+                .padding()
         }
-        .listStyle(.insetGrouped)
+        .background(AppTheme.groupedBackground)
     }
 }
