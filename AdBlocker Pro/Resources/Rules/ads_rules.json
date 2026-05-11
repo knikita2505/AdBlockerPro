@@ -1,0 +1,82 @@
+[
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*doubleclick.net", "*googlesyndication.com", "*googleadservices.com", "*google-analytics.com", "*adservice.google.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*ad.doubleclick.net", "*pagead2.googlesyndication.com", "*tpc.googlesyndication.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*ads.facebook.com", "*an.facebook.com", "*pixel.facebook.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*ads.yahoo.com", "*analytics.yahoo.com", "*ads.yap.yahoo.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*adnxs.com", "*adsrvr.org", "*adroll.com", "*adform.net", "*adtech.de"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*outbrain.com", "*taboola.com", "*revcontent.com", "*mgid.com", "*content-ad.net"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*amazon-adsystem.com", "*aax.amazon.com", "*assoc-amazon.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*moat.com", "*serving-sys.com", "*rubiconproject.com", "*openx.net", "*pubmatic.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*criteo.com", "*criteo.net", "*bidswitch.net", "*casalemedia.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*popads.net", "*popcash.net", "*propellerads.com", "*admaven.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*smartadserver.com", "*smaato.net", "*inmobi.com", "*mopub.com", "*unity3d.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*teads.tv", "*sharethrough.com", "*33across.com", "*indexexchange.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "/ads\\.js", "url-filter-is-case-sensitive": false },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "/ad[sx]?[_/\\-]", "resource-type": ["script", "image", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "banner[_/\\-]?ad", "resource-type": ["image", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*adskeeper.co.uk", "*adsterra.com", "*clickadu.com", "*hilltopads.net", "*exoclick.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*ad-maven.com", "*adcash.com", "*clickadilla.com", "*trafficjunky.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*media.net", "*contextweb.com", "*yieldmo.com", "*triplelift.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*zedo.com", "*exponential.com", "*conversantmedia.com", "*undertone.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*bidvertiser.com", "*clickbooth.com", "*go2cloud.org"] },
+    "action": { "type": "block" }
+  }
+]

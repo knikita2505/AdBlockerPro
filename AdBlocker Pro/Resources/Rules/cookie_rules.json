@@ -1,0 +1,62 @@
+[
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*cookiebot.com", "*consent.cookiebot.com", "*consentcdn.cookiebot.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*onetrust.com", "*cdn.cookielaw.org", "*optanon.blob.core.windows.net", "*cookielaw.org"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*trustarc.com", "*consent.trustarc.com", "*consent-pref.trustarc.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*quantcast.com", "*quantcast.mgr.consensu.org"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*privacy-center.org", "*privacymanager.io"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*usercentrics.eu", "*app.usercentrics.eu", "*aggregator.service.usercentrics.eu"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*didomi.io", "*sdk.privacy-center.org"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "cookie.?consent", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "cookie.?notice", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "cookie.?banner", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "gdpr.?consent", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*iubenda.com", "*cdn.iubenda.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*termly.io", "*app.termly.io"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*secureprivacy.ai", "*app.secureprivacy.ai"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*osano.com", "*cmp.osano.com"] },
+    "action": { "type": "block" }
+  }
+]

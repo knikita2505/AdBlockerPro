@@ -1,0 +1,42 @@
+[
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*pornhub.com", "*xvideos.com", "*xnxx.com", "*xhamster.com", "*redtube.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*youporn.com", "*tube8.com", "*spankbang.com", "*beeg.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*chaturbate.com", "*bongacams.com", "*stripchat.com", "*cam4.com", "*livejasmin.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*onlyfans.com", "*fansly.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*brazzers.com", "*realitykings.com", "*bangbros.com", "*naughtyamerica.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*hentaihaven.xxx", "*nhentai.net", "*hanime.tv", "*rule34.xxx"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*motherless.com", "*ixxx.com", "*txxx.com", "*hqporner.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*eporner.com", "*tnaflix.com", "*drtuber.com", "*porntrex.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*imagefap.com", "*literotica.com", "*eroshare.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*sex.com", "*porn.com", "*xxx.com", "*adult.com"] },
+    "action": { "type": "block" }
+  }
+]
