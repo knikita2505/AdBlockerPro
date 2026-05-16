@@ -1,0 +1,42 @@
+[
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*bet365.com", "*betfair.com", "*williamhill.com", "*paddypower.com", "*ladbrokes.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*pokerstars.com", "*888poker.com", "*partypoker.com", "*ggpoker.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*draftkings.com", "*fanduel.com", "*betmgm.com", "*caesars.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*888casino.com", "*betway.com", "*unibet.com", "*bwin.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*1xbet.com", "*melbet.com", "*22bet.com", "*stake.com", "*stake.us"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*pinnacle.com", "*marathonbet.com", "*betsson.com", "*10bet.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*casumo.com", "*leovegas.com", "*mrgreen.com", "*rizk.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*bovada.lv", "*ignitioncasino.eu", "*slotsofvegas.com", "*casinomax.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*roobet.com", "*bitcasino.io", "*cloudbet.com", "*fortunejack.com"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*", "if-domain": ["*vulkanvegas.com", "*slottica.com", "*joycasino.com", "*play-fortuna.com"] },
+    "action": { "type": "block" }
+  }
+]

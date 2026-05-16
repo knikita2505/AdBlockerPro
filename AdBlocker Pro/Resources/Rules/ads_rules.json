@@ -1,0 +1,187 @@
+[
+  {
+    "trigger": { "url-filter": "doubleclick\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "googlesyndication\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "googleadservices\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adservice\\.google\\." },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "ads\\.facebook\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "an\\.facebook\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "ads\\.yahoo\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adnxs\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adsrvr\\.org" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adroll\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adform\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "outbrain\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "taboola\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "revcontent\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "mgid\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "amazon-adsystem\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "moat\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "serving-sys\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "rubiconproject\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "openx\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "pubmatic\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "criteo\\.(com|net)" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "bidswitch\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "casalemedia\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "popads\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "popcash\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "propellerads\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "smartadserver\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "smaato\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "inmobi\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "teads\\.tv" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "sharethrough\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "indexexchange\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adsterra\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "clickadu\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "exoclick\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "media\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "yieldmo\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "triplelift\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "zedo\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "conversantmedia\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "bidvertiser\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "/ads\\.js" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "/ad[sx]?[_/\\-]", "resource-type": ["script", "image", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "banner[_/\\-]?ad", "resource-type": ["image", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*",
+      "resource-type": ["popup"] },
+    "action": { "type": "block" }
+  }
+]

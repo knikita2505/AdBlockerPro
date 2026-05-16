@@ -1,0 +1,58 @@
+[
+  {
+    "trigger": { "url-filter": "cookiebot\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "cookielaw\\.org" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "onetrust\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "consent\\.trustarc\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "usercentrics\\.eu" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "didomi\\.io" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "iubenda\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "termly\\.io" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "secureprivacy\\.ai" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "osano\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "cookie.?consent", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "cookie.?notice", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "gdpr.?consent", "resource-type": ["script"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": ".*" },
+    "action": { "type": "css-display-none", "selector": "#cookie-notice, #cookie-law-info-bar, #cookie-consent-banner, .cookie-consent, .cookie-banner, .cookie-notice, .cookie-popup, .cookie-modal, .cc-window, .cc-banner, .cc-dialog, .cc_container, .cc_banner, #cookiebanner, #cookieConsent, #CookieConsent, .CookieConsent, #cookies-banner, #gdpr-banner, #gdpr-consent, .gdpr-banner, .gdpr-popup, #onetrust-banner-sdk, #onetrust-consent-sdk, .onetrust-pc-dark-filter, #cookieNotice, .cookie_notice, #cookie_notice, .js-cookie-consent, #consent-banner, .consent-banner, .consent-popup, #didomi-popup, #didomi-host, .iubenda-cs-container, #usercentrics-root, .termly-styles-reset, #osano-cm-window, .cky-consent-container, .cky-consent-bar" }
+  }
+]
