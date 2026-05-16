@@ -1,82 +1,146 @@
 [
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*google-analytics.com", "*googletagmanager.com", "*googletagservices.com"] },
+    "trigger": { "url-filter": "google-analytics\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*connect.facebook.net", "*pixel.facebook.com", "*graph.facebook.com"] },
+    "trigger": { "url-filter": "googletagmanager\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*analytics.twitter.com", "*t.co", "*static.ads-twitter.com"] },
+    "trigger": { "url-filter": "googletagservices\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*hotjar.com", "*static.hotjar.com", "*script.hotjar.com"] },
+    "trigger": { "url-filter": "connect\\.facebook\\.net" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*mixpanel.com", "*cdn.mxpnl.com", "*api.mixpanel.com"] },
+    "trigger": { "url-filter": "pixel\\.facebook\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*segment.com", "*cdn.segment.com", "*api.segment.io"] },
+    "trigger": { "url-filter": "analytics\\.twitter\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*amplitude.com", "*api.amplitude.com", "*cdn.amplitude.com"] },
+    "trigger": { "url-filter": "static\\.ads-twitter\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*newrelic.com", "*nr-data.net", "*js-agent.newrelic.com"] },
+    "trigger": { "url-filter": "hotjar\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*fullstory.com", "*rs.fullstory.com", "*edge.fullstory.com"] },
+    "trigger": { "url-filter": "mixpanel\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*mouseflow.com", "*cdn.mouseflow.com", "*o2.mouseflow.com"] },
+    "trigger": { "url-filter": "cdn\\.mxpnl\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*clarity.ms", "*c.clarity.ms", "*s.clarity.ms"] },
+    "trigger": { "url-filter": "segment\\.(com|io)" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*crazyegg.com", "*script.crazyegg.com", "*dnn506yrbagrg.cloudfront.net"] },
+    "trigger": { "url-filter": "amplitude\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*quantserve.com", "*pixel.quantserve.com", "*quantcast.com"] },
+    "trigger": { "url-filter": "nr-data\\.net" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*scorecardresearch.com", "*sb.scorecardresearch.com"] },
+    "trigger": { "url-filter": "js-agent\\.newrelic\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*chartbeat.com", "*static.chartbeat.com", "*ping.chartbeat.net"] },
+    "trigger": { "url-filter": "fullstory\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*optimizely.com", "*cdn.optimizely.com", "*logx.optimizely.com"] },
+    "trigger": { "url-filter": "mouseflow\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*tapad.com", "*liadm.com", "*bluekai.com", "*addthis.com"] },
+    "trigger": { "url-filter": "clarity\\.ms" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*demdex.net", "*omtrdc.net", "*2o7.net", "*everesttech.net"] },
+    "trigger": { "url-filter": "crazyegg\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*branch.io", "*app.link", "*bnc.lt"] },
+    "trigger": { "url-filter": "quantserve\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*adjust.com", "*app.adjust.com", "*appsflyer.com", "*app.appsflyer.com"] },
+    "trigger": { "url-filter": "quantcast\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "scorecardresearch\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "chartbeat\\.(com|net)" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "optimizely\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "tapad\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "liadm\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "bluekai\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "addthis\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "demdex\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "omtrdc\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "2o7\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "everesttech\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "branch\\.io" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adjust\\.com", "resource-type": ["script", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "appsflyer\\.com", "resource-type": ["script", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "bugsnag\\.com", "resource-type": ["script", "raw"] },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "sentry\\.io", "resource-type": ["script", "raw"] },
     "action": { "type": "block" }
   }
 ]

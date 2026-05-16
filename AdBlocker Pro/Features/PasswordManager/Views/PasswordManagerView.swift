@@ -28,42 +28,57 @@ struct PasscodeUnlockView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppTheme.spacingXL) {
-                Spacer()
+            ZStack {
+                GradientBackground()
 
-                ZStack {
-                    Circle()
-                        .fill(AppTheme.accent.opacity(0.10))
-                        .frame(width: 100, height: 100)
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 38, weight: .medium))
-                        .foregroundStyle(AppTheme.accent)
-                }
+                VStack(spacing: AppTheme.spacingXL) {
+                    Spacer()
 
-                Text(String(localized: "Enter Passcode"))
-                    .font(.system(size: 20, weight: .semibold))
-
-                passcodeDotsView
-
-                numberPad
-
-                if passcodeService.canUseBiometrics && passcodeService.isBiometricsEnabled {
-                    Button {
-                        Task { await passcodeService.authenticateWithBiometrics() }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: biometricIcon)
-                            Text("Use \(passcodeService.biometricName)")
-                        }
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(AppTheme.accent)
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.accent.opacity(0.15))
+                            .frame(width: 100, height: 100)
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 38, weight: .medium, design: .rounded))
+                            .foregroundStyle(AppTheme.accent)
                     }
-                }
 
-                Spacer()
+                    VStack(spacing: AppTheme.spacingS) {
+                        Text(String(localized: "Enter Passcode"))
+                            .font(AppTheme.titleMedium)
+                            .foregroundStyle(AppTheme.primaryText)
+                        Text(String(localized: "Enter your 4-digit passcode"))
+                            .font(AppTheme.captionFont)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+
+                    passcodeDotsView
+
+                    numberPad
+
+                    if passcodeService.canUseBiometrics && passcodeService.isBiometricsEnabled {
+                        Button {
+                            HapticManager.impact(.light)
+                            Task { await passcodeService.authenticateWithBiometrics() }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: biometricIcon)
+                                Text("Use \(passcodeService.biometricName)")
+                            }
+                            .font(AppTheme.bodyMedium)
+                            .foregroundStyle(AppTheme.accent)
+                            .padding(.horizontal, AppTheme.spacingL)
+                            .padding(.vertical, 12)
+                            .background(AppTheme.accentSoft)
+                            .clipShape(Capsule())
+                        }
+                        .pressable()
+                    }
+
+                    Spacer()
+                }
+                .padding(AppTheme.spacingL)
             }
-            .padding(AppTheme.spacingL)
-            .background(AppTheme.background)
             .navigationTitle(String(localized: "Passwords"))
             .navigationBarTitleDisplayMode(.inline)
             .alert("Incorrect Passcode", isPresented: $showError) {
@@ -78,11 +93,12 @@ struct PasscodeUnlockView: View {
     }
 
     private var passcodeDotsView: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: AppTheme.spacingM) {
             ForEach(0..<4, id: \.self) { index in
                 Circle()
                     .fill(index < enteredCode.count ? AppTheme.accent : AppTheme.accent.opacity(0.2))
                     .frame(width: 14, height: 14)
+                    .animation(.spring(response: 0.3), value: enteredCode.count)
             }
         }
     }
@@ -98,7 +114,7 @@ struct PasscodeUnlockView: View {
                 if !enteredCode.isEmpty { enteredCode.removeLast() }
             } label: {
                 Image(systemName: "delete.backward")
-                    .font(.system(size: 20))
+                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
                     .frame(width: 56, height: 56)
             }
@@ -122,11 +138,12 @@ struct PasscodeUnlockView: View {
             }
         } label: {
             Text(num)
-                .font(.system(size: 24, weight: .medium))
+                .font(.system(size: 24, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.primaryText)
                 .frame(width: 56, height: 56)
-                .background(AppTheme.groupedBackground)
+                .background(AppTheme.surface)
                 .clipShape(Circle())
+                .shadow(color: AppTheme.shadowSoft, radius: 4, x: 0, y: 2)
         }
     }
 
@@ -148,12 +165,41 @@ struct PasswordManagerHomeView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Picker("Section", selection: $selectedSection) {
+                HStack(spacing: AppTheme.spacingS) {
                     ForEach(PasswordSection.allCases, id: \.self) { section in
-                        Text(section.title).tag(section)
+                        Button {
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedSection = section
+                            }
+                            HapticManager.impact(.light)
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: section.icon)
+                                    .font(.system(size: 13, weight: .semibold))
+                                Text(section.title)
+                                    .font(AppTheme.bodyMedium)
+                            }
+                            .foregroundStyle(selectedSection == section ? .white : AppTheme.secondaryText)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                selectedSection == section
+                                ? AnyShapeStyle(LinearGradient(
+                                    colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ))
+                                : AnyShapeStyle(AppTheme.surface)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
+                            .shadow(color: selectedSection == section ? AppTheme.accent.opacity(0.3) : .clear, radius: 8, y: 2)
+                        }
+                        .pressable()
                     }
                 }
-                .pickerStyle(.segmented)
+                .padding(AppTheme.spacingXS)
+                .background(AppTheme.surfaceSecondary)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
                 .padding(.horizontal, AppTheme.spacingM)
                 .padding(.vertical, AppTheme.spacingS)
 
@@ -165,12 +211,14 @@ struct PasswordManagerHomeView: View {
                         case .saved:
                             SavedPasswordsSection()
                         }
+
+                        Spacer(minLength: 100)
                     }
                     .padding(.horizontal, AppTheme.spacingM)
                     .padding(.top, AppTheme.spacingS)
                 }
             }
-            .background(AppTheme.groupedBackground)
+            .background(GradientBackground())
             .navigationTitle(String(localized: "Passwords"))
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -185,6 +233,13 @@ enum PasswordSection: String, CaseIterable {
         switch self {
         case .generator: return String(localized: "Generator")
         case .saved: return String(localized: "Saved")
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .generator: return "wand.and.stars"
+        case .saved: return "key.fill"
         }
     }
 }

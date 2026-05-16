@@ -14,14 +14,11 @@ final class NetworkPrivacyService {
     var scanProgress: Double = 0
 
     var connectionType: ConnectionType = .unknown
-    var ssidName: String?
     var isUsingVPN = false
-    var dnsInfo: String = "Standard"
 
     var checks: [PrivacyCheck] = []
 
-    private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue(label: "network.monitor")
+    // MARK: - Scan
 
     func startScan() {
         isScanning = true
@@ -29,15 +26,36 @@ final class NetworkPrivacyService {
         scanProgress = 0
         checks = []
 
-        detectConnectionType()
-
         Task {
-            for step in 1...5 {
-                try? await Task.sleep(for: .milliseconds(600))
-                scanProgress = Double(step) / 5.0
-            }
+            detectConnectionType()
+            scanProgress = 0.15
 
-            buildChecks()
+            isUsingVPN = checkVPNActive()
+            scanProgress = 0.30
+
+            let httpsOK = await testHTTPSConnection()
+            scanProgress = 0.50
+
+            let dnsEncrypted = checkDNSEncryption()
+            scanProgress = 0.65
+
+            let proxyConfigured = checkProxySettings()
+            scanProgress = 0.80
+
+            let ipv6Available = await checkIPv6Support()
+            scanProgress = 0.90
+
+            let externalIP = await fetchExternalIP()
+            scanProgress = 1.0
+
+            buildChecks(
+                httpsOK: httpsOK,
+                dnsEncrypted: dnsEncrypted,
+                proxyConfigured: proxyConfigured,
+                ipv6Available: ipv6Available,
+                externalIP: externalIP
+            )
+
             isScanning = false
             scanComplete = true
             HapticManager.notification(.success)
@@ -51,10 +69,11 @@ final class NetworkPrivacyService {
         checks = []
     }
 
-    // MARK: - Detection
+    // MARK: - Connection Type
 
     private func detectConnectionType() {
-        let path = NWPathMonitor().currentPath
+        let monitor = NWPathMonitor()
+        let path = monitor.currentPath
 
         if path.usesInterfaceType(.wifi) {
             connectionType = .wifi
@@ -65,9 +84,9 @@ final class NetworkPrivacyService {
         } else {
             connectionType = .unknown
         }
-
-        isUsingVPN = checkVPNActive()
     }
+
+    // MARK: - VPN Detection
 
     private func checkVPNActive() -> Bool {
         #if os(iOS)
@@ -75,22 +94,136 @@ final class NetworkPrivacyService {
               let scoped = cfDict["__SCOPED__"] as? [String: Any] else {
             return false
         }
-        return scoped.keys.contains { $0.contains("tap") || $0.contains("tun") || $0.contains("ppp") || $0.contains("ipsec") || $0.contains("utun") }
+        let vpnInterfaces = ["tap", "tun", "ppp", "ipsec", "utun"]
+        return scoped.keys.contains { key in
+            vpnInterfaces.contains { key.contains($0) }
+        }
         #else
         return false
         #endif
     }
 
+    // MARK: - HTTPS Test
+
+    private func testHTTPSConnection() async -> Bool {
+        guard let url = URL(string: "https://www.apple.com") else { return false }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 10
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                return (200...399).contains(httpResponse.statusCode)
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
+
+    // MARK: - DNS Resolution Check
+
+    private func checkDNSEncryption() -> Bool {
+        let hostname = "dns-check.apple.com"
+        var hints = addrinfo()
+        hints.ai_family = AF_UNSPEC
+        hints.ai_socktype = SOCK_STREAM
+
+        var result: UnsafeMutablePointer<addrinfo>?
+        let status = getaddrinfo(hostname, nil, &hints, &result)
+        if let result { freeaddrinfo(result) }
+
+        return status == 0
+    }
+
+    // MARK: - Proxy Settings
+
+    private func checkProxySettings() -> Bool {
+        #if os(iOS)
+        guard let cfDict = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? [String: Any] else {
+            return false
+        }
+
+        if let httpProxy = cfDict["HTTPProxy"] as? String, !httpProxy.isEmpty {
+            return true
+        }
+        if let httpsProxy = cfDict["HTTPSProxy"] as? String, !httpsProxy.isEmpty {
+            return true
+        }
+        if let httpEnable = cfDict["HTTPEnable"] as? Int, httpEnable == 1 {
+            return true
+        }
+        if let httpsEnable = cfDict["HTTPSEnable"] as? Int, httpsEnable == 1 {
+            return true
+        }
+
+        return false
+        #else
+        return false
+        #endif
+    }
+
+    // MARK: - IPv6 Support
+
+    private func checkIPv6Support() async -> Bool {
+        let monitor = NWPathMonitor()
+        let path = monitor.currentPath
+
+        if path.supportsIPv6 {
+            return true
+        }
+
+        guard let url = URL(string: "https://ipv6.google.com") else { return false }
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 5
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                return (200...399).contains(httpResponse.statusCode)
+            }
+            return false
+        } catch {
+            return false
+        }
+    }
+
+    // MARK: - External IP
+
+    private func fetchExternalIP() async -> String? {
+        guard let url = URL(string: "https://api.ipify.org") else { return nil }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 8
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let ip = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return ip
+        } catch {
+            return nil
+        }
+    }
+
     // MARK: - Build Checks
 
-    private func buildChecks() {
+    private func buildChecks(
+        httpsOK: Bool,
+        dnsEncrypted: Bool,
+        proxyConfigured: Bool,
+        ipv6Available: Bool,
+        externalIP: String?
+    ) {
         var results: [PrivacyCheck] = []
 
         switch connectionType {
         case .wifi:
             results.append(PrivacyCheck(
                 title: String(localized: "Wi-Fi Connection"),
-                subtitle: ssidName ?? String(localized: "Connected"),
+                subtitle: String(localized: "Connected to Wi-Fi network"),
                 icon: "wifi",
                 status: .info
             ))
@@ -127,35 +260,68 @@ final class NetworkPrivacyService {
         } else {
             results.append(PrivacyCheck(
                 title: String(localized: "No VPN Detected"),
-                subtitle: String(localized: "Consider using a VPN on public networks"),
+                subtitle: connectionType == .wifi
+                    ? String(localized: "Consider using a VPN on public Wi-Fi")
+                    : String(localized: "VPN adds an extra layer of privacy"),
                 icon: "shield.slash",
-                status: .warning
+                status: connectionType == .wifi ? .warning : .info
             ))
         }
 
         results.append(PrivacyCheck(
-            title: String(localized: "DNS Configuration"),
-            subtitle: String(localized: "Using default DNS settings"),
-            icon: "server.rack",
-            status: .info
+            title: String(localized: "HTTPS Connection"),
+            subtitle: httpsOK
+                ? String(localized: "Secure connections are working properly")
+                : String(localized: "HTTPS connections may be blocked or intercepted"),
+            icon: httpsOK ? "lock.fill" : "lock.open.fill",
+            status: httpsOK ? .good : .warning
         ))
 
-        if connectionType == .wifi && !isUsingVPN {
+        results.append(PrivacyCheck(
+            title: String(localized: "DNS Resolution"),
+            subtitle: dnsEncrypted
+                ? String(localized: "DNS is resolving correctly")
+                : String(localized: "DNS resolution failed — check your network settings"),
+            icon: "server.rack",
+            status: dnsEncrypted ? .good : .warning
+        ))
+
+        results.append(PrivacyCheck(
+            title: String(localized: "Proxy Settings"),
+            subtitle: proxyConfigured
+                ? String(localized: "A proxy is configured on this network")
+                : String(localized: "No proxy detected"),
+            icon: proxyConfigured ? "arrow.triangle.branch" : "checkmark.circle",
+            status: proxyConfigured ? .info : .good
+        ))
+
+        results.append(PrivacyCheck(
+            title: String(localized: "IPv6 Support"),
+            subtitle: ipv6Available
+                ? String(localized: "Your network supports the modern IPv6 protocol")
+                : String(localized: "IPv6 is not available on this network"),
+            icon: "network",
+            status: ipv6Available ? .good : .info
+        ))
+
+        if let ip = externalIP {
             results.append(PrivacyCheck(
-                title: String(localized: "Public Wi-Fi Risk"),
-                subtitle: String(localized: "Use VPN when connected to public Wi-Fi networks"),
-                icon: "exclamationmark.triangle.fill",
-                status: .warning
+                title: String(localized: "External IP Address"),
+                subtitle: isUsingVPN
+                    ? String(localized: "\(ip) (routed through VPN)")
+                    : ip,
+                icon: "globe",
+                status: .info
             ))
         }
 
         results.append(PrivacyCheck(
             title: String(localized: "Safari Protection"),
-            subtitle: ContentBlockerManager.shared.enabledFilters.isEmpty
-                ? String(localized: "Enable content blocking for safer browsing")
-                : String(localized: "\(ContentBlockerManager.shared.enabledFilters.count) filters active"),
+            subtitle: ContentBlockerManager.shared.isProtectionActive
+                ? String(localized: "\(ContentBlockerManager.shared.enabledFilters.count) filters active")
+                : String(localized: "Enable content blocking for safer browsing"),
             icon: "shield.checkered",
-            status: ContentBlockerManager.shared.enabledFilters.isEmpty ? .warning : .good
+            status: ContentBlockerManager.shared.isProtectionActive ? .good : .warning
         ))
 
         checks = results

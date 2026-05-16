@@ -45,16 +45,18 @@ struct AdBlocker_ProApp: App {
 
     private func configureAppearance() {
         #if os(iOS)
+        let bgColor = UIColor(red: 0.98, green: 0.984, blue: 0.988, alpha: 1)
+
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithDefaultBackground()
-        tabBarAppearance.backgroundColor = .white
+        tabBarAppearance.backgroundColor = bgColor
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         UITabBar.appearance().standardAppearance = tabBarAppearance
 
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithDefaultBackground()
-        navBarAppearance.backgroundColor = .white
-        navBarAppearance.shadowColor = UIColor(white: 0.92, alpha: 1)
+        navBarAppearance.backgroundColor = bgColor
+        navBarAppearance.shadowColor = .clear
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
         UINavigationBar.appearance().standardAppearance = navBarAppearance
         #endif

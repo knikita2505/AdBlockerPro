@@ -13,25 +13,47 @@ struct PasscodeSetupView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                GradientBackground()
+
                 VStack(spacing: AppTheme.spacingXL) {
                     Spacer()
 
                     ZStack {
                         Circle()
-                            .fill(AppTheme.accent.opacity(0.12))
-                            .frame(width: 100, height: 100)
-                        Image(systemName: step.icon)
-                            .font(.system(size: 40))
-                            .foregroundStyle(AppTheme.accent)
+                            .fill(AppTheme.accent.opacity(0.10))
+                            .frame(width: 110, height: 110)
+                        Circle()
+                            .fill(AppTheme.accent.opacity(0.20))
+                            .frame(width: 85, height: 85)
+                        ZStack {
+                            Circle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 64, height: 64)
+                            Image(systemName: step.icon)
+                                .font(.system(size: 26, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white)
+                                .contentTransition(.symbolEffect(.replace))
+                        }
+                        .shadow(color: AppTheme.accent.opacity(0.3), radius: 12, y: 4)
                     }
 
-                    Text(step.title)
-                        .font(AppTheme.titleFont)
+                    VStack(spacing: AppTheme.spacingS) {
+                        Text(step.title)
+                            .font(AppTheme.titleMedium)
+                            .foregroundStyle(AppTheme.primaryText)
 
-                    Text(step.subtitle)
-                        .font(AppTheme.captionFont)
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .multilineTextAlignment(.center)
+                        Text(step.subtitle)
+                            .font(AppTheme.captionFont)
+                            .foregroundStyle(AppTheme.secondaryText)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, AppTheme.spacingL)
+                    }
 
                     if step != .biometrics {
                         passcodeDotsView
@@ -48,16 +70,17 @@ struct PasscodeSetupView: View {
                         .transition(.opacity)
                 }
             }
-            .animation(.easeInOut, value: step)
-            .navigationTitle("Passwords")
-            .alert("Codes Don't Match", isPresented: $showMismatchError) {
-                Button("Try Again", role: .cancel) {
+            .animation(.easeInOut(duration: 0.35), value: step)
+            .navigationTitle(String(localized: "Passwords"))
+            .navigationBarTitleDisplayMode(.inline)
+            .alert(String(localized: "Codes Don't Match"), isPresented: $showMismatchError) {
+                Button(String(localized: "Try Again"), role: .cancel) {
                     firstCode = ""
                     confirmCode = ""
                     step = .create
                 }
             } message: {
-                Text("Please try creating your passcode again.")
+                Text(String(localized: "Please try creating your passcode again."))
             }
         }
     }
@@ -66,18 +89,24 @@ struct PasscodeSetupView: View {
         step == .create ? firstCode : confirmCode
     }
 
+    // MARK: - Dots
+
     private var passcodeDotsView: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: AppTheme.spacingM) {
             ForEach(0..<4, id: \.self) { index in
                 Circle()
                     .fill(index < currentCode.count ? AppTheme.accent : AppTheme.accent.opacity(0.2))
                     .frame(width: 16, height: 16)
+                    .scaleEffect(index < currentCode.count ? 1.15 : 1.0)
+                    .animation(.spring(response: 0.25), value: currentCode.count)
             }
         }
     }
 
+    // MARK: - Number Pad
+
     private var numberPad: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 16) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 14) {
             ForEach(1...9, id: \.self) { num in
                 numberButton(String(num))
             }
@@ -94,7 +123,7 @@ struct PasscodeSetupView: View {
                 }
             } label: {
                 Image(systemName: "delete.backward")
-                    .font(.title2)
+                    .font(.system(size: 20, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
                     .frame(width: 60, height: 60)
             }
@@ -133,11 +162,12 @@ struct PasscodeSetupView: View {
             }
         } label: {
             Text(num)
-                .font(.title.bold())
+                .font(.system(size: 24, weight: .semibold, design: .rounded))
                 .foregroundStyle(AppTheme.primaryText)
                 .frame(width: 60, height: 60)
-                .background(AppTheme.secondaryBackground)
+                .background(AppTheme.surface)
                 .clipShape(Circle())
+                .shadow(color: AppTheme.shadowSoft, radius: 4, x: 0, y: 2)
         }
     }
 
@@ -147,42 +177,80 @@ struct PasscodeSetupView: View {
         VStack(spacing: AppTheme.spacingL) {
             Spacer()
 
-            Image(systemName: passcodeService.biometricType == .faceID ? "faceid" : "touchid")
-                .font(.system(size: 64))
-                .foregroundStyle(AppTheme.accent)
+            ZStack {
+                Circle()
+                    .fill(AppTheme.accent.opacity(0.10))
+                    .frame(width: 130, height: 130)
+                Circle()
+                    .fill(AppTheme.accent.opacity(0.20))
+                    .frame(width: 100, height: 100)
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 72, height: 72)
+                    Image(systemName: passcodeService.biometricType == .faceID ? "faceid" : "touchid")
+                        .font(.system(size: 34, weight: .medium))
+                        .foregroundStyle(.white)
+                }
+                .shadow(color: AppTheme.accent.opacity(0.3), radius: 12, y: 4)
+            }
 
-            Text("Enable \(passcodeService.biometricName)?")
-                .font(AppTheme.titleFont)
+            VStack(spacing: AppTheme.spacingS) {
+                Text("Enable \(passcodeService.biometricName)?")
+                    .font(AppTheme.titleMedium)
+                    .foregroundStyle(AppTheme.primaryText)
 
-            Text("Use \(passcodeService.biometricName) for quick access to your passwords")
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppTheme.spacingL)
+                Text("Use \(passcodeService.biometricName) for quick access to your passwords")
+                    .font(AppTheme.captionFont)
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppTheme.spacingL)
+            }
 
             Spacer()
 
-            Button {
-                passcodeService.isBiometricsEnabled = true
-                passcodeService.setPasscode(confirmCode)
-                HapticManager.notification(.success)
-            } label: {
-                Text("Enable \(passcodeService.biometricName)")
-                    .font(AppTheme.headlineFont)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(AppTheme.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
-            }
+            VStack(spacing: AppTheme.spacingM) {
+                Button {
+                    passcodeService.isBiometricsEnabled = true
+                    passcodeService.setPasscode(confirmCode)
+                    HapticManager.notification(.success)
+                } label: {
+                    Text("Enable \(passcodeService.biometricName)")
+                        .font(AppTheme.bodyMedium)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
+                        .shadow(color: AppTheme.accent.opacity(0.3), radius: 12, y: 4)
+                }
+                .pressable()
 
-            Button {
-                passcodeService.setPasscode(confirmCode)
-                HapticManager.notification(.success)
-            } label: {
-                Text("Skip")
-                    .font(AppTheme.footnoteFont)
-                    .foregroundStyle(AppTheme.secondaryText)
+                Button {
+                    passcodeService.setPasscode(confirmCode)
+                    HapticManager.notification(.success)
+                } label: {
+                    Text(String(localized: "Skip"))
+                        .font(AppTheme.bodyMedium)
+                        .foregroundStyle(AppTheme.secondaryText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(AppTheme.surfaceSecondary)
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
+                }
+                .pressable()
             }
         }
         .padding(AppTheme.spacingL)

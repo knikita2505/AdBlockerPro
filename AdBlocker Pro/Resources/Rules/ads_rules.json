@@ -1,54 +1,174 @@
 [
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*doubleclick.net", "*googlesyndication.com", "*googleadservices.com", "*google-analytics.com", "*adservice.google.com"] },
+    "trigger": { "url-filter": "doubleclick\\.net" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*ad.doubleclick.net", "*pagead2.googlesyndication.com", "*tpc.googlesyndication.com"] },
+    "trigger": { "url-filter": "googlesyndication\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*ads.facebook.com", "*an.facebook.com", "*pixel.facebook.com"] },
+    "trigger": { "url-filter": "googleadservices\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*ads.yahoo.com", "*analytics.yahoo.com", "*ads.yap.yahoo.com"] },
+    "trigger": { "url-filter": "adservice\\.google\\." },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*adnxs.com", "*adsrvr.org", "*adroll.com", "*adform.net", "*adtech.de"] },
+    "trigger": { "url-filter": "ads\\.facebook\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*outbrain.com", "*taboola.com", "*revcontent.com", "*mgid.com", "*content-ad.net"] },
+    "trigger": { "url-filter": "an\\.facebook\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*amazon-adsystem.com", "*aax.amazon.com", "*assoc-amazon.com"] },
+    "trigger": { "url-filter": "ads\\.yahoo\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*moat.com", "*serving-sys.com", "*rubiconproject.com", "*openx.net", "*pubmatic.com"] },
+    "trigger": { "url-filter": "adnxs\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*criteo.com", "*criteo.net", "*bidswitch.net", "*casalemedia.com"] },
+    "trigger": { "url-filter": "adsrvr\\.org" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*popads.net", "*popcash.net", "*propellerads.com", "*admaven.com"] },
+    "trigger": { "url-filter": "adroll\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*smartadserver.com", "*smaato.net", "*inmobi.com", "*mopub.com", "*unity3d.com"] },
+    "trigger": { "url-filter": "adform\\.net" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*teads.tv", "*sharethrough.com", "*33across.com", "*indexexchange.com"] },
+    "trigger": { "url-filter": "outbrain\\.com" },
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": "/ads\\.js", "url-filter-is-case-sensitive": false },
+    "trigger": { "url-filter": "taboola\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "revcontent\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "mgid\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "amazon-adsystem\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "moat\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "serving-sys\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "rubiconproject\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "openx\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "pubmatic\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "criteo\\.(com|net)" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "bidswitch\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "casalemedia\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "popads\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "popcash\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "propellerads\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "smartadserver\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "smaato\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "inmobi\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "teads\\.tv" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "sharethrough\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "indexexchange\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "adsterra\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "clickadu\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "exoclick\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "media\\.net" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "yieldmo\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "triplelift\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "zedo\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "conversantmedia\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "bidvertiser\\.com" },
+    "action": { "type": "block" }
+  },
+  {
+    "trigger": { "url-filter": "/ads\\.js" },
     "action": { "type": "block" }
   },
   {
@@ -60,23 +180,8 @@
     "action": { "type": "block" }
   },
   {
-    "trigger": { "url-filter": ".*", "if-domain": ["*adskeeper.co.uk", "*adsterra.com", "*clickadu.com", "*hilltopads.net", "*exoclick.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*ad-maven.com", "*adcash.com", "*clickadilla.com", "*trafficjunky.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*media.net", "*contextweb.com", "*yieldmo.com", "*triplelift.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*zedo.com", "*exponential.com", "*conversantmedia.com", "*undertone.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*bidvertiser.com", "*clickbooth.com", "*go2cloud.org"] },
+    "trigger": { "url-filter": ".*",
+      "resource-type": ["popup"] },
     "action": { "type": "block" }
   }
 ]

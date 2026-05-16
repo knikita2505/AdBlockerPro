@@ -27,13 +27,52 @@ final class ContentBlockerManager {
     }
 
     var isReloading = false
+    var isExtensionEnabled = false
 
     private let filtersKey = "enabledFilters"
     private let allowedKey = "allowedWebsites"
     private let blockedKey = "blockedWebsites"
+    private let lastFiltersKey = "lastEnabledFilters"
 
     private init() {
         loadState()
+        Task { await checkExtensionStatus() }
+    }
+
+    // MARK: - Global Toggle
+
+    var isProtectionActive: Bool {
+        !enabledFilters.isEmpty
+    }
+
+    func toggleProtection() {
+        if isProtectionActive {
+            UserDefaults.standard.set(enabledFilters.map(\.rawValue), forKey: lastFiltersKey)
+            enabledFilters.removeAll()
+        } else {
+            if let last = UserDefaults.standard.stringArray(forKey: lastFiltersKey),
+               !last.isEmpty {
+                enabledFilters = Set(last.compactMap { FilterCategory(rawValue: $0) })
+            } else {
+                enabledFilters = Set(FilterCategory.allCases)
+            }
+        }
+        Task { await rebuildAndReload() }
+    }
+
+    // MARK: - Extension Status
+
+    func checkExtensionStatus() async {
+        #if os(iOS)
+        do {
+            let state = try await SFContentBlockerManager.stateOfContentBlocker(
+                withIdentifier: Self.extensionBundleIdentifier
+            )
+            await MainActor.run { isExtensionEnabled = state.isEnabled }
+        } catch {
+            await MainActor.run { isExtensionEnabled = false }
+        }
+        #endif
     }
 
     // MARK: - Filter Toggle

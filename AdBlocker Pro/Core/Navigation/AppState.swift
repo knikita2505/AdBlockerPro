@@ -16,7 +16,7 @@ enum AppTab: Int, CaseIterable {
 
     var icon: String {
         switch self {
-        case .network: return "wifi.shield"
+        case .network: return "wifi"
         case .safari: return "shield.checkered"
         case .passwords: return "key.fill"
         }
