@@ -4,8 +4,8 @@ struct SafariSetupGuideView: View {
 
     private let steps: [(icon: String, title: String, description: String)] = [
         ("gear", String(localized: "Open Settings"), String(localized: "Open the Settings app on your device")),
-        ("safari", String(localized: "Go to Safari"), String(localized: "Scroll down and tap on Safari")),
-        ("puzzlepiece.extension", String(localized: "Open Extensions"), String(localized: "Tap on Extensions in the Safari settings")),
+        ("app.badge", String(localized: "Go to Apps"), String(localized: "Tap Apps, then find and tap Safari")),
+        ("puzzlepiece.extension", String(localized: "Open Extensions"), String(localized: "Tap Extensions in the Safari settings")),
         ("checkmark.circle.fill", String(localized: "Enable AdBlocker Pro"), String(localized: "Find AdBlocker Pro in the list and toggle it on")),
         ("arrow.uturn.backward", String(localized: "Return to App"), String(localized: "Come back to AdBlocker Pro and start using protection"))
     ]
@@ -67,7 +67,7 @@ struct SafariSetupGuideView: View {
                 }
                 .tint(AppTheme.accent)
             } footer: {
-                Text("This will open the Settings app where you can enable the Safari extension")
+                Text("This will open Safari settings where you can enable the extension")
             }
         }
         .listStyle(.insetGrouped)
@@ -76,8 +76,9 @@ struct SafariSetupGuideView: View {
 
     private func openAppSettings() {
         #if os(iOS)
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-        UIApplication.shared.open(url)
+        if let url = URL(string: "App-prefs:SAFARI&path=WEB_EXTENSIONS") {
+            UIApplication.shared.open(url)
+        }
         #endif
     }
 }

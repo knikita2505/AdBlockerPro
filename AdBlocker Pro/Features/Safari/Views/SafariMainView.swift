@@ -8,6 +8,7 @@ struct SafariMainView: View {
 
     @State private var showSettings = false
     @State private var showGuides = false
+    @State private var showExtensionAlert = false
 
     private var activeFilterCount: Int {
         FilterCategory.allCases.filter { viewModel.isFilterEnabled($0) }.count
@@ -46,6 +47,18 @@ struct SafariMainView: View {
             }
             .onAppear {
                 Task { await contentBlocker.checkExtensionStatus() }
+            }
+            .alert(String(localized: "Extension Not Enabled"), isPresented: $showExtensionAlert) {
+                Button(String(localized: "Open Settings")) {
+                    #if os(iOS)
+                    if let url = URL(string: "App-prefs:SAFARI&path=WEB_EXTENSIONS") {
+                        UIApplication.shared.open(url)
+                    }
+                    #endif
+                }
+                Button(String(localized: "Cancel"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "Enable the AdBlocker Pro extension in Settings → Apps → Safari → Extensions to start blocking ads."))
             }
         }
     }
@@ -107,7 +120,7 @@ struct SafariMainView: View {
         Button {
             HapticManager.impact(.light)
             #if os(iOS)
-            if let url = URL(string: UIApplication.openSettingsURLString) {
+            if let url = URL(string: "App-prefs:SAFARI&path=WEB_EXTENSIONS") {
                 UIApplication.shared.open(url)
             }
             #endif
@@ -126,7 +139,7 @@ struct SafariMainView: View {
                     Text(String(localized: "Extension Disabled"))
                         .font(AppTheme.bodyMedium)
                         .foregroundStyle(AppTheme.primaryText)
-                    Text(String(localized: "Enable in Settings → Safari → Extensions"))
+                    Text(String(localized: "Settings → Apps → Safari → Extensions"))
                         .font(AppTheme.captionFont)
                         .foregroundStyle(AppTheme.secondaryText)
                         .lineLimit(2)
@@ -155,7 +168,11 @@ struct SafariMainView: View {
         VStack(spacing: AppTheme.spacingM) {
             Button {
                 HapticManager.impact(.medium)
-                contentBlocker.toggleProtection()
+                if !contentBlocker.isExtensionEnabled {
+                    showExtensionAlert = true
+                } else {
+                    contentBlocker.toggleProtection()
+                }
             } label: {
                 ZStack {
                     Circle()
@@ -213,10 +230,6 @@ struct SafariMainView: View {
                     .foregroundStyle(AppTheme.tertiaryText)
             }
 
-            if contentBlocker.isReloading {
-                ProgressView()
-                    .tint(AppTheme.accent)
-            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppTheme.spacingL)
@@ -239,6 +252,10 @@ struct SafariMainView: View {
                         isOn: viewModel.isFilterEnabled(category),
                         isLocked: !subscriptionManager.isPremium
                     ) { newValue in
+                        if newValue && !contentBlocker.isExtensionEnabled {
+                            showExtensionAlert = true
+                            return
+                        }
                         HapticManager.impact(.light)
                         viewModel.toggleFilter(category, isOn: newValue)
                     }
@@ -303,15 +320,21 @@ private struct FilterToggleCard: View {
     let isLocked: Bool
     let onToggle: (Bool) -> Void
 
+    @State private var showTooltip = false
+
     var body: some View {
         HStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
-                    .fill(category.iconColor.opacity(0.12))
-                    .frame(width: 44, height: 44)
-                Image(systemName: category.icon)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(category.iconColor)
+            Button {
+                showTooltip = true
+            } label: {
+                ZStack {
+                    RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
+                        .fill(category.iconColor.opacity(0.12))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: category.icon)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundStyle(category.iconColor)
+                }
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -335,6 +358,67 @@ private struct FilterToggleCard: View {
         }
         .padding(.horizontal, AppTheme.spacingM)
         .padding(.vertical, AppTheme.spacingM - 2)
+        .sheet(isPresented: $showTooltip) {
+            FilterTooltipSheet(category: category)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(AppTheme.background)
+        }
+    }
+}
+
+// MARK: - Filter Tooltip Sheet
+
+private struct FilterTooltipSheet: View {
+    let category: FilterCategory
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: AppTheme.spacingL) {
+            ZStack {
+                Circle()
+                    .fill(category.iconColor.opacity(0.12))
+                    .frame(width: 72, height: 72)
+                Image(systemName: category.icon)
+                    .font(.system(size: 30, weight: .semibold, design: .rounded))
+                    .foregroundStyle(category.iconColor)
+            }
+            .padding(.top, AppTheme.spacingL)
+
+            Text(category.title)
+                .font(AppTheme.titleMedium)
+                .foregroundStyle(AppTheme.primaryText)
+
+            Text(category.tooltip)
+                .font(AppTheme.bodyFont)
+                .foregroundStyle(AppTheme.secondaryText)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, AppTheme.spacingL)
+
+            Spacer()
+
+            Button {
+                dismiss()
+            } label: {
+                Text(String(localized: "Got It"))
+                    .font(AppTheme.bodyMedium)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
+            }
+            .pressable()
+            .padding(.horizontal, AppTheme.spacingL)
+            .padding(.bottom, AppTheme.spacingL)
+        }
     }
 }
 

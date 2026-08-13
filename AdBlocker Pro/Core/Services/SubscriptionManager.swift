@@ -19,8 +19,9 @@ final class SubscriptionManager {
 
     // MARK: - Subscription Status
 
+    // TODO: Remove `true ||` before release — testing override
     func checkSubscriptionStatus() {
-        let hasActive = Apphud.hasActiveSubscription()
+        let hasActive = true || Apphud.hasActiveSubscription()
         if isPremium != hasActive {
             isPremium = hasActive
         }

@@ -1,42 +1,70 @@
 [
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*bet365.com", "*betfair.com", "*williamhill.com", "*paddypower.com", "*ladbrokes.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*pokerstars.com", "*888poker.com", "*partypoker.com", "*ggpoker.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*draftkings.com", "*fanduel.com", "*betmgm.com", "*caesars.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*888casino.com", "*betway.com", "*unibet.com", "*bwin.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*1xbet.com", "*melbet.com", "*22bet.com", "*stake.com", "*stake.us"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*pinnacle.com", "*marathonbet.com", "*betsson.com", "*10bet.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*casumo.com", "*leovegas.com", "*mrgreen.com", "*rizk.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*bovada.lv", "*ignitioncasino.eu", "*slotsofvegas.com", "*casinomax.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*roobet.com", "*bitcasino.io", "*cloudbet.com", "*fortunejack.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*vulkanvegas.com", "*slottica.com", "*joycasino.com", "*play-fortuna.com"] },
-    "action": { "type": "block" }
-  }
+  {"trigger":{"url-filter":"bet365\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betfair\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"williamhill\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"paddypower\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"ladbrokes\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pokerstars\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"888poker\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"partypoker\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"ggpoker\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"draftkings\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fanduel\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betmgm\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"caesars\\..*\\/sports"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"888casino\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betway\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"unibet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bwin\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"1xbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"melbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"22bet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"stake\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pinnacle\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"marathonbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betsson\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"10bet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"casumo\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"leovegas\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"mrgreen\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"rizk\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bovada\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"ignitioncasino\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"slotsofvegas\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"casinomax\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"roobet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bitcasino\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cloudbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fortunejack\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"vulkanvegas\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"slottica\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"joycasino\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"play-fortuna\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fonbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"leon\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"parimatch\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"mostbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betwinner\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betano\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"novibet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"sportingbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"netbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betclic\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"winamax\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tipico\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betvictor\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"supabets\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"hollywoodbets\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betking\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"spinpalace\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"jackpotcity\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"royalvegas\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"allslots\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"1win\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pin-up\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"vbet\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"megapari\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"betandyou\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"888sport\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bet-at-home\\."},"action":{"type":"block"}}
 ]

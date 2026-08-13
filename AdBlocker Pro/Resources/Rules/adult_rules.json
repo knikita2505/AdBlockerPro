@@ -1,42 +1,81 @@
 [
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*pornhub.com", "*xvideos.com", "*xnxx.com", "*xhamster.com", "*redtube.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*youporn.com", "*tube8.com", "*spankbang.com", "*beeg.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*chaturbate.com", "*bongacams.com", "*stripchat.com", "*cam4.com", "*livejasmin.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*onlyfans.com", "*fansly.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*brazzers.com", "*realitykings.com", "*bangbros.com", "*naughtyamerica.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*hentaihaven.xxx", "*nhentai.net", "*hanime.tv", "*rule34.xxx"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*motherless.com", "*ixxx.com", "*txxx.com", "*hqporner.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*eporner.com", "*tnaflix.com", "*drtuber.com", "*porntrex.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*imagefap.com", "*literotica.com", "*eroshare.com"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*", "if-domain": ["*sex.com", "*porn.com", "*xxx.com", "*adult.com"] },
-    "action": { "type": "block" }
-  }
+  {"trigger":{"url-filter":"pornhub\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"xvideos\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"xnxx\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"xhamster\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"redtube\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"youporn\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tube8\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"spankbang\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"beeg\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"porntube\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"chaturbate\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bongacams\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"stripchat\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cam4\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"livejasmin\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"onlyfans\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fansly\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"manyvids\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"brazzers\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"realitykings\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bangbros\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"naughtyamerica\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"hentaihaven\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"nhentai\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"hanime\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"rule34\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"motherless\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"ixxx\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"txxx\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"hqporner\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"eporner\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tnaflix\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"drtuber\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"porntrex\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"imagefap\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"literotica\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"4tube\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"sunporno\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"porndig\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"thumbzilla\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"xhamsterlive\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornhublive\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fuq\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"lobstertube\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"youjizz\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cliphunter\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"empflix\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"alohatube\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fapster\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornmd\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornone\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornzog\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornkai\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornhat\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"porn300\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornhd\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pornoxo\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"porn00\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"javhd\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"javmost\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"javlibrary\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"missav\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"avgle\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fc2\\..*\\/adult"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"erome\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"sexvid\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tubegalore\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tubev\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tubxporn\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"hellporno\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"gotporn\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"keezmovies\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"extremetube\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"slutload\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"porn\\.com"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"xxx\\.com"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"://[^/]*xxxvideos\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"://[^/]*adultfriendfinder\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"://[^/]*ashleymadison\\."},"action":{"type":"block"}}
 ]

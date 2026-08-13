@@ -36,6 +36,8 @@ final class ContentBlockerManager {
 
     private init() {
         loadState()
+        let rules = buildCombinedRules()
+        writeRulesToAppGroup(rules)
         Task { await checkExtensionStatus() }
     }
 
@@ -46,6 +48,8 @@ final class ContentBlockerManager {
     }
 
     func toggleProtection() {
+        guard isExtensionEnabled else { return }
+
         if isProtectionActive {
             UserDefaults.standard.set(enabledFilters.map(\.rawValue), forKey: lastFiltersKey)
             enabledFilters.removeAll()
@@ -78,6 +82,7 @@ final class ContentBlockerManager {
     // MARK: - Filter Toggle
 
     func toggleFilter(_ category: FilterCategory, isOn: Bool) {
+        guard isExtensionEnabled || !isOn else { return }
         if isOn {
             enabledFilters.insert(category)
         } else {
@@ -143,8 +148,11 @@ final class ContentBlockerManager {
         }
 
         for domain in blockedWebsites {
+            let pattern = domain
+                .replacingOccurrences(of: ".", with: "\\.")
+                + "\\."
             let rule: [String: Any] = [
-                "trigger": ["url-filter": ".*", "if-domain": ["*\(domain)"]],
+                "trigger": ["url-filter": pattern],
                 "action": ["type": "block"]
             ]
             allRules.append(rule)
@@ -159,11 +167,11 @@ final class ContentBlockerManager {
         }
 
         if allRules.isEmpty {
-            let emptyRule: [String: Any] = [
-                "trigger": ["url-filter": "^$"],
+            let noopRule: [String: Any] = [
+                "trigger": ["url-filter": "://never\\.match\\.this\\.domain\\.invalid"],
                 "action": ["type": "block"]
             ]
-            allRules.append(emptyRule)
+            allRules.append(noopRule)
         }
 
         return allRules
