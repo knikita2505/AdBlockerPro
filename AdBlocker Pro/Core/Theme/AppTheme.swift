@@ -23,7 +23,7 @@ enum AppTheme {
     static let warning = Color(hex: "F59E0B")
     static let destructive = Color(hex: "EF4444")
 
-    static let shadowSoft = Color.black.opacity(0.04)
+    static let shadowSoft = Color.black.opacity(0.05)
     static let shadowMedium = Color.black.opacity(0.08)
 
     // MARK: - Spacing
@@ -81,8 +81,8 @@ struct CardStyle: ViewModifier {
             .padding(padding)
             .background(AppTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
-            .shadow(color: AppTheme.shadowSoft, radius: 8, x: 0, y: 2)
-            .shadow(color: AppTheme.shadowMedium, radius: 1, x: 0, y: 1)
+            .shadow(color: AppTheme.shadowSoft, radius: 12, x: 0, y: 4)
+            .shadow(color: AppTheme.shadowMedium, radius: 1, x: 0, y: 0.5)
     }
 }
 
@@ -139,8 +139,9 @@ struct GradientBackground: View {
     var body: some View {
         LinearGradient(
             colors: [
+                Color(hex: "F8FAFB"),
                 AppTheme.background,
-                AppTheme.surfaceSecondary.opacity(0.5)
+                Color(hex: "F3F5F7")
             ],
             startPoint: .top,
             endPoint: .bottom

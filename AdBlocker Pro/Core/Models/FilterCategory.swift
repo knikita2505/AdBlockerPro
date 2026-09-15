@@ -45,23 +45,23 @@ enum FilterCategory: String, CaseIterable, Identifiable, Codable {
 
     var icon: String {
         switch self {
-        case .ads: return "flame.fill"
-        case .cookieBanners: return "star.fill"
-        case .trackers: return "antenna.radiowaves.left.and.right.slash"
-        case .adultContent: return "18.square.fill"
+        case .ads: return "rectangle.slash.fill"
+        case .cookieBanners: return "hand.raised.fill"
+        case .trackers: return "eye.slash.fill"
+        case .adultContent: return "18.circle.fill"
         case .imageBlocking: return "photo.fill"
-        case .gambling: return "ladybug.fill"
+        case .gambling: return "dice.fill"
         }
     }
 
     var iconColor: Color {
         switch self {
-        case .ads: return .red
-        case .cookieBanners: return .orange
-        case .trackers: return .blue
-        case .adultContent: return .pink
-        case .imageBlocking: return .purple
-        case .gambling: return .red
+        case .ads: return Color(hex: "EF4444")
+        case .cookieBanners: return Color(hex: "F59E0B")
+        case .trackers: return Color(hex: "3B82F6")
+        case .adultContent: return Color(hex: "EC4899")
+        case .imageBlocking: return Color(hex: "8B5CF6")
+        case .gambling: return Color(hex: "EA580C")
         }
     }
 
