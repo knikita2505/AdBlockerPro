@@ -48,18 +48,20 @@ final class ContentBlockerManager {
     }
 
     func toggleProtection() {
-        guard isExtensionEnabled else { return }
-
         if isProtectionActive {
             UserDefaults.standard.set(enabledFilters.map(\.rawValue), forKey: lastFiltersKey)
             enabledFilters.removeAll()
+            Task { await rebuildAndReload() }
+            return
+        }
+
+        guard isExtensionEnabled else { return }
+
+        if let last = UserDefaults.standard.stringArray(forKey: lastFiltersKey),
+           !last.isEmpty {
+            enabledFilters = Set(last.compactMap { FilterCategory(rawValue: $0) })
         } else {
-            if let last = UserDefaults.standard.stringArray(forKey: lastFiltersKey),
-               !last.isEmpty {
-                enabledFilters = Set(last.compactMap { FilterCategory(rawValue: $0) })
-            } else {
-                enabledFilters = Set(FilterCategory.allCases)
-            }
+            enabledFilters = Set(FilterCategory.allCases)
         }
         Task { await rebuildAndReload() }
     }
@@ -72,7 +74,12 @@ final class ContentBlockerManager {
             let state = try await SFContentBlockerManager.stateOfContentBlocker(
                 withIdentifier: Self.extensionBundleIdentifier
             )
-            await MainActor.run { isExtensionEnabled = state.isEnabled }
+            await MainActor.run {
+                isExtensionEnabled = state.isEnabled
+                if !state.isEnabled {
+                    deactivateProtectionIfNeeded()
+                }
+            }
         } catch {
             await MainActor.run { isExtensionEnabled = false }
         }
@@ -80,6 +87,13 @@ final class ContentBlockerManager {
     }
 
     // MARK: - Filter Toggle
+
+    func deactivateProtectionIfNeeded() {
+        guard isProtectionActive else { return }
+        UserDefaults.standard.set(enabledFilters.map(\.rawValue), forKey: lastFiltersKey)
+        enabledFilters.removeAll()
+        Task { await rebuildAndReload() }
+    }
 
     func toggleFilter(_ category: FilterCategory, isOn: Bool) {
         guard isExtensionEnabled || !isOn else { return }

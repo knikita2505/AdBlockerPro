@@ -8,7 +8,9 @@ struct SafariMainView: View {
 
     @State private var showSettings = false
     @State private var showGuides = false
-    @State private var showExtensionAlert = false
+    @State private var showExtensionSetup = false
+
+    @Environment(\.scenePhase) private var scenePhase
 
     private var activeFilterCount: Int {
         FilterCategory.allCases.filter { viewModel.isFilterEnabled($0) }.count
@@ -45,20 +47,16 @@ struct SafariMainView: View {
                 PrivacyGuidesView()
                     .presentationBackground(AppTheme.background)
             }
+            .fullScreenCover(isPresented: $showExtensionSetup) {
+                SafariSetupGuideView()
+            }
             .onAppear {
                 Task { await contentBlocker.checkExtensionStatus() }
             }
-            .alert(String(localized: "Extension Not Enabled"), isPresented: $showExtensionAlert) {
-                Button(String(localized: "Open Settings")) {
-                    #if os(iOS)
-                    if let url = URL(string: "App-prefs:SAFARI&path=WEB_EXTENSIONS") {
-                        UIApplication.shared.open(url)
-                    }
-                    #endif
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    Task { await contentBlocker.checkExtensionStatus() }
                 }
-                Button(String(localized: "Cancel"), role: .cancel) {}
-            } message: {
-                Text(String(localized: "Enable the AdBlocker Pro extension in Settings → Apps → Safari → Extensions to start blocking ads."))
             }
         }
     }
@@ -111,41 +109,36 @@ struct SafariMainView: View {
     private var extensionBanner: some View {
         Button {
             HapticManager.impact(.light)
-            #if os(iOS)
-            if let url = URL(string: "App-prefs:SAFARI&path=WEB_EXTENSIONS") {
-                UIApplication.shared.open(url)
-            }
-            #endif
+            showExtensionSetup = true
         } label: {
             HStack(spacing: AppTheme.spacingM) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .frame(width: 32, height: 32)
-                    .background(AppTheme.warning)
+                    .background(AppTheme.destructive)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(String(localized: "Extension Disabled"))
-                        .font(AppTheme.bodyMedium)
-                        .foregroundStyle(AppTheme.primaryText)
-                    Text(String(localized: "Settings → Apps → Safari → Extensions"))
-                        .font(AppTheme.captionFont)
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .lineLimit(2)
-                }
+                Text(String(localized: "Enable AdBlocker Pro Extension"))
+                    .font(AppTheme.bodyMedium)
+                    .foregroundStyle(AppTheme.primaryText)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                Spacer()
+                Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(AppTheme.tertiaryText)
+                    .foregroundStyle(AppTheme.destructive.opacity(0.7))
             }
             .padding(.horizontal, AppTheme.spacingM)
             .padding(.vertical, 14)
-            .background(AppTheme.surface)
+            .background(AppTheme.destructive.opacity(0.08))
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
-            .shadow(color: AppTheme.shadowSoft, radius: 10, y: 3)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous)
+                    .stroke(AppTheme.destructive, lineWidth: 1.5)
+            )
         }
         .pressable()
     }
@@ -156,8 +149,12 @@ struct SafariMainView: View {
         VStack(spacing: AppTheme.spacingM) {
             Button {
                 HapticManager.impact(.medium)
-                if !contentBlocker.isExtensionEnabled {
-                    showExtensionAlert = true
+                if contentBlocker.isProtectionActive {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
+                        contentBlocker.toggleProtection()
+                    }
+                } else if !contentBlocker.isExtensionEnabled {
+                    showExtensionSetup = true
                 } else {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
                         contentBlocker.toggleProtection()
@@ -255,7 +252,7 @@ struct SafariMainView: View {
                         isLocked: !subscriptionManager.isPremium
                     ) { newValue in
                         if newValue && !contentBlocker.isExtensionEnabled {
-                            showExtensionAlert = true
+                            showExtensionSetup = true
                             return
                         }
                         viewModel.toggleFilter(category, isOn: newValue)
@@ -373,78 +370,13 @@ private struct FilterToggleCard: View {
         .padding(.horizontal, AppTheme.spacingM)
         .padding(.vertical, 12)
         .sheet(isPresented: $showTooltip) {
-            FilterTooltipSheet(category: category)
+            InfoTipSheet(
+                icon: category.icon,
+                iconColor: category.iconColor,
+                title: category.title,
+                message: category.tooltip
+            )
         }
-    }
-}
-
-// MARK: - Filter Tooltip Sheet
-
-private struct FilterTooltipSheet: View {
-    let category: FilterCategory
-    @Environment(\.dismiss) private var dismiss
-    @State private var sheetHeight: CGFloat = 240
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.spacingM) {
-            HStack(spacing: 12) {
-                Image(systemName: category.icon)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(category.iconColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-
-                Text(category.title)
-                    .font(AppTheme.titleSmall)
-                    .foregroundStyle(AppTheme.primaryText)
-
-                Spacer()
-            }
-
-            Text(category.tooltip)
-                .font(AppTheme.bodyFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Button {
-                dismiss()
-            } label: {
-                Text(String(localized: "Got It"))
-                    .font(AppTheme.bodyMedium)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 13)
-                    .background(AppTheme.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
-            }
-            .pressable()
-            .padding(.top, 4)
-        }
-        .padding(.horizontal, AppTheme.spacingL)
-        .padding(.top, AppTheme.spacingM)
-        .padding(.bottom, AppTheme.spacingL)
-        .background {
-            GeometryReader { geo in
-                Color.clear.preference(key: FilterSheetHeightKey.self, value: geo.size.height)
-            }
-        }
-        .onPreferenceChange(FilterSheetHeightKey.self) { newHeight in
-            if newHeight > 0 {
-                sheetHeight = newHeight
-            }
-        }
-        .presentationDetents([.height(sheetHeight)])
-        .presentationDragIndicator(.visible)
-        .presentationBackground(AppTheme.surface)
-        .presentationCornerRadius(24)
-    }
-}
-
-private struct FilterSheetHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
     }
 }
 

@@ -109,6 +109,80 @@ extension View {
     }
 }
 
+// MARK: - Compact Info Sheet
+
+struct InfoTipSheet: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    let message: String
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var sheetHeight: CGFloat = 240
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppTheme.spacingM) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(iconColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+
+                Text(title)
+                    .font(AppTheme.titleSmall)
+                    .foregroundStyle(AppTheme.primaryText)
+
+                Spacer()
+            }
+
+            Text(message)
+                .font(AppTheme.bodyFont)
+                .foregroundStyle(AppTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                dismiss()
+            } label: {
+                Text(String(localized: "Got It"))
+                    .font(AppTheme.bodyMedium)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 13)
+                    .background(AppTheme.accent)
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
+            }
+            .pressable()
+            .padding(.top, 4)
+        }
+        .padding(.horizontal, AppTheme.spacingL)
+        .padding(.top, AppTheme.spacingM)
+        .padding(.bottom, AppTheme.spacingL)
+        .background {
+            GeometryReader { geo in
+                Color.clear.preference(key: InfoTipSheetHeightKey.self, value: geo.size.height)
+            }
+        }
+        .onPreferenceChange(InfoTipSheetHeightKey.self) { newHeight in
+            if newHeight > 0 {
+                sheetHeight = newHeight
+            }
+        }
+        .presentationDetents([.height(sheetHeight)])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(AppTheme.surface)
+        .presentationCornerRadius(24)
+    }
+}
+
+private struct InfoTipSheetHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 // MARK: - Text Styles
 
 extension Text {
