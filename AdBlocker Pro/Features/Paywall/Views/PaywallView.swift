@@ -286,6 +286,8 @@ final class PaywallViewModel {
 
     private(set) var weeklyProduct: ApphudProduct?
     private(set) var yearlyProduct: ApphudProduct?
+    private var weeklyStoreProduct: Product?
+    private var yearlyStoreProduct: Product?
     var isTrialEligible = false
     var isLoadingProducts = true
     var loadingError: PaywallError?
@@ -303,20 +305,19 @@ final class PaywallViewModel {
     }
 
     var weeklyPriceText: String? {
-        guard let p = weeklyProduct?.skProduct else { return nil }
-        let price = formatPrice(p)
-        return isTrialEligible ? "then \(price)/wk" : "\(price)/wk"
+        guard let p = weeklyStoreProduct else { return nil }
+        return isTrialEligible ? "then \(p.displayPrice)/wk" : "\(p.displayPrice)/wk"
     }
 
     var yearlyPriceText: String? {
-        guard let p = yearlyProduct?.skProduct else { return nil }
-        return "\(formatPrice(p))/yr"
+        guard let p = yearlyStoreProduct else { return nil }
+        return "\(p.displayPrice)/yr"
     }
 
     var yearlyPerWeekText: String? {
-        guard let p = yearlyProduct?.skProduct else { return nil }
-        let weekly = (p.price as Decimal) / 52
-        return "\(formatDecimal(weekly, locale: p.priceLocale))/week"
+        guard let p = yearlyStoreProduct else { return nil }
+        let weekly = p.price / 52
+        return "\(weekly.formatted(p.priceFormatStyle))/week"
     }
 
     func onAppear() {
@@ -376,10 +377,9 @@ final class PaywallViewModel {
         Apphud.fetchPlacements { [weak self] placements, error in
             guard let self else { return }
             Task { @MainActor in
-                self.isLoadingProducts = false
-
                 guard let found = placements.first(where: { $0.identifier == self.placement.identifier }),
                       let paywall = found.paywall else {
+                    self.isLoadingProducts = false
                     self.loadingError = .productsNotAvailable
                     return
                 }
@@ -394,19 +394,25 @@ final class PaywallViewModel {
                     self.selectedPlan = .yearly
                 }
 
-                self.checkTrialEligibility()
+                await self.refreshStoreKitProducts()
+                await self.updateTrialEligibility()
+                self.isLoadingProducts = false
             }
         }
     }
 
-    private func checkTrialEligibility() {
-        guard let skProduct = weeklyProduct?.skProduct else {
+    private func refreshStoreKitProducts() async {
+        weeklyStoreProduct = try? await weeklyProduct?.product()
+        yearlyStoreProduct = try? await yearlyProduct?.product()
+    }
+
+    private func updateTrialEligibility() async {
+        guard let product = weeklyStoreProduct,
+              product.subscription?.introductoryOffer != nil else {
             isTrialEligible = false
             return
         }
-        Apphud.checkEligibilityForIntroductoryOffer(product: skProduct) { [weak self] eligible in
-            Task { @MainActor in self?.isTrialEligible = eligible }
-        }
+        isTrialEligible = await product.subscription?.isEligibleForIntroOffer ?? false
     }
 
     private func showErr(_ msg: String) {
@@ -427,17 +433,6 @@ final class PaywallViewModel {
             }
             return "Purchase failed. Please try again."
         }
-    }
-
-    private func formatPrice(_ product: SKProduct) -> String {
-        formatDecimal(product.price as Decimal, locale: product.priceLocale)
-    }
-
-    private func formatDecimal(_ value: Decimal, locale: Locale) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = locale
-        return formatter.string(from: value as NSDecimalNumber) ?? "\(value)"
     }
 }
 
