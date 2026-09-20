@@ -63,7 +63,7 @@ struct PasscodeUnlockView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: biometricIcon)
-                                Text("Use \(passcodeService.biometricName)")
+                                Text(String(localized: "Use \(passcodeService.biometricName)"))
                             }
                             .font(AppTheme.bodyMedium)
                             .foregroundStyle(AppTheme.accent)
@@ -81,8 +81,8 @@ struct PasscodeUnlockView: View {
             }
             .navigationTitle(String(localized: "Passwords"))
             .navigationBarTitleDisplayMode(.inline)
-            .alert("Incorrect Passcode", isPresented: $showError) {
-                Button("Try Again", role: .cancel) { enteredCode = "" }
+            .alert(String(localized: "Incorrect Passcode"), isPresented: $showError) {
+                Button(String(localized: "Try Again"), role: .cancel) { enteredCode = "" }
             }
             .onAppear {
                 if passcodeService.canUseBiometrics && passcodeService.isBiometricsEnabled {

@@ -61,12 +61,15 @@ NSFaceIDUsageDescription: "AdBlocker Pro uses Face ID to protect your saved pass
 
 ## 6. Локализация
 
-Проект поддерживает: EN (базовый), ES, DE, FR, JA.
+Проект поддерживает: EN (базовый), ES, JA, pt-BR.
+
+Строки UI — в `AdBlocker Pro/Resources/Localizable.xcstrings`.
+Описание Face ID — в `AdBlocker Pro/Resources/InfoPlist.xcstrings`.
 
 В настройках проекта:
 1. **Project → Info → Localizations**
-2. Добавь: Spanish, German, French, Japanese
-3. `Localizable.xcstrings` уже содержит переводы
+2. Языки: English, Spanish, Japanese, Portuguese (Brazil)
+3. После добавления строк в код обнови каталог в Xcode (**Product → Export Localizations** не обязателен: правки в `.xcstrings` подхватываются)
 
 ## 7. Apphud Dashboard
 

@@ -66,10 +66,10 @@ struct PaywallView: View {
                 dismiss()
             }
         }
-        .alert("Purchase Failed", isPresented: $vm.showError) {
-            Button("OK", role: .cancel) {}
+        .alert(String(localized: "Purchase Failed"), isPresented: $vm.showError) {
+            Button(String(localized: "OK"), role: .cancel) {}
         } message: {
-            Text(vm.errorMessage ?? "Something went wrong.")
+            Text(vm.errorMessage ?? String(localized: "Something went wrong."))
         }
     }
 
@@ -87,10 +87,10 @@ struct PaywallView: View {
             }
             .padding(.top, AppTheme.spacingL)
 
-            Text("Unlock Full Protection")
+            Text(String(localized: "Unlock Full Protection"))
                 .font(.title.bold())
 
-            Text("Get complete Safari protection with premium features")
+            Text(String(localized: "Get complete Safari protection with premium features"))
                 .font(AppTheme.bodyFont)
                 .foregroundStyle(AppTheme.secondaryText)
                 .multilineTextAlignment(.center)
@@ -130,7 +130,7 @@ struct PaywallView: View {
                 .font(AppTheme.captionFont)
                 .foregroundStyle(AppTheme.secondaryText)
                 .multilineTextAlignment(.center)
-            Button("Try Again") { vm.retryLoadProducts() }
+            Button(String(localized: "Try Again")) { vm.retryLoadProducts() }
                 .font(AppTheme.headlineFont)
                 .tint(AppTheme.accent)
         }
@@ -188,7 +188,7 @@ struct PaywallView: View {
             .disabled(vm.isPurchasing || vm.isLoadingProducts || !vm.hasAnyProduct)
 
             HStack(spacing: AppTheme.spacingM) {
-                Text("Cancel anytime")
+                Text(String(localized: "Cancel anytime"))
                     .font(AppTheme.captionFont)
                     .foregroundStyle(AppTheme.secondaryText)
                 Image(systemName: "checkmark.shield.fill")
@@ -199,7 +199,7 @@ struct PaywallView: View {
             Button {
                 vm.restore()
             } label: {
-                Text("Restore Purchases")
+                Text(String(localized: "Restore Purchases"))
                     .font(AppTheme.footnoteFont)
                     .foregroundStyle(AppTheme.secondaryText)
             }
@@ -210,11 +210,11 @@ struct PaywallView: View {
 
     private var footerLinks: some View {
         HStack(spacing: AppTheme.spacingM) {
-            Link("Terms of Use", destination: URL(string: PaywallConstants.termsURL)!)
+            Link(String(localized: "Terms of Use"), destination: URL(string: PaywallConstants.termsURL)!)
                 .font(AppTheme.captionFont)
                 .foregroundStyle(AppTheme.tertiaryText)
             Text("•").foregroundStyle(AppTheme.tertiaryText)
-            Link("Privacy Policy", destination: URL(string: PaywallConstants.privacyURL)!)
+            Link(String(localized: "Privacy Policy"), destination: URL(string: PaywallConstants.privacyURL)!)
                 .font(AppTheme.captionFont)
                 .foregroundStyle(AppTheme.tertiaryText)
         }
@@ -306,18 +306,20 @@ final class PaywallViewModel {
 
     var weeklyPriceText: String? {
         guard let p = weeklyStoreProduct else { return nil }
-        return isTrialEligible ? "then \(p.displayPrice)/wk" : "\(p.displayPrice)/wk"
+        return isTrialEligible
+            ? String(localized: "then \(p.displayPrice)/wk")
+            : String(localized: "\(p.displayPrice)/wk")
     }
 
     var yearlyPriceText: String? {
         guard let p = yearlyStoreProduct else { return nil }
-        return "\(p.displayPrice)/yr"
+        return String(localized: "\(p.displayPrice)/yr")
     }
 
     var yearlyPerWeekText: String? {
         guard let p = yearlyStoreProduct else { return nil }
         let weekly = p.price / 52
-        return "\(weekly.formatted(p.priceFormatStyle))/week"
+        return String(localized: "\(weekly.formatted(p.priceFormatStyle))/week")
     }
 
     func onAppear() {
@@ -335,7 +337,7 @@ final class PaywallViewModel {
     func purchaseSelected() {
         let product: ApphudProduct? = selectedPlan == .weekly ? weeklyProduct : yearlyProduct
         guard let product else {
-            showErr("Unable to load subscription. Please check your connection.")
+            showErr(String(localized: "Unable to load subscription. Please check your connection."))
             return
         }
 
@@ -362,7 +364,7 @@ final class PaywallViewModel {
                 if Apphud.hasActiveSubscription() {
                     self.purchaseSuccessful = true
                 } else {
-                    self.showErr("No active subscription found.")
+                    self.showErr(String(localized: "No active subscription found."))
                 }
             }
         }
@@ -421,17 +423,17 @@ final class PaywallViewModel {
     }
 
     private func friendlyError(_ error: Error?) -> String {
-        guard let error else { return "Purchase could not be completed." }
+        guard let error else { return String(localized: "Purchase could not be completed.") }
         let code = (error as NSError).code
         switch code {
-        case 2: return "Purchase was cancelled."
-        case 4: return "Purchases are not allowed on this device."
-        case 7: return "Could not connect to the App Store. Check your internet."
+        case 2: return String(localized: "Purchase was cancelled.")
+        case 4: return String(localized: "Purchases are not allowed on this device.")
+        case 7: return String(localized: "Could not connect to the App Store. Check your internet.")
         default:
             if (error as NSError).domain == NSURLErrorDomain {
-                return "No internet connection."
+                return String(localized: "No internet connection.")
             }
-            return "Purchase failed. Please try again."
+            return String(localized: "Purchase failed. Please try again.")
         }
     }
 }
@@ -448,15 +450,15 @@ enum PaywallError {
 
     var title: String {
         switch self {
-        case .productsNotAvailable: return "Products Unavailable"
-        case .noInternet: return "No Connection"
+        case .productsNotAvailable: return String(localized: "Products Unavailable")
+        case .noInternet: return String(localized: "No Connection")
         }
     }
 
     var message: String {
         switch self {
-        case .productsNotAvailable: return "Subscriptions are temporarily unavailable. Please try again later."
-        case .noInternet: return "Please check your internet connection."
+        case .productsNotAvailable: return String(localized: "Subscriptions are temporarily unavailable. Please try again later.")
+        case .noInternet: return String(localized: "Please check your internet connection.")
         }
     }
 }

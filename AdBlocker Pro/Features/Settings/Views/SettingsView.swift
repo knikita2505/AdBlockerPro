@@ -245,7 +245,7 @@ struct SettingsView: View {
             Text("AdBlocker Pro")
                 .font(AppTheme.captionMedium)
                 .foregroundStyle(AppTheme.secondaryText)
-            Text("Version \(appVersion)")
+            Text(String(localized: "Version \(appVersion)"))
                 .font(AppTheme.captionFont)
                 .foregroundStyle(AppTheme.tertiaryText)
         }

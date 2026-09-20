@@ -1,0 +1,35 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSFaceIDUsageDescription" : {
+      "comment" : "Privacy - Face ID Usage Description",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AdBlocker Pro uses Face ID to protect your saved passwords"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AdBlocker Pro usa Face ID para proteger tus contraseñas guardadas"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AdBlocker Proは保存したパスワードを保護するためにFace IDを使用します"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O AdBlocker Pro usa o Face ID para proteger suas senhas salvas"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}
