@@ -19,9 +19,8 @@ final class SubscriptionManager {
 
     // MARK: - Subscription Status
 
-    // TODO: Remove `true ||` before release — testing override
     func checkSubscriptionStatus() {
-        let hasActive = true || Apphud.hasActiveSubscription()
+        let hasActive = Apphud.hasActiveSubscription()
         if isPremium != hasActive {
             isPremium = hasActive
         }
@@ -116,6 +115,7 @@ enum PremiumFeature {
     case imageBlocking
     case allowedWebsites
     case blockedWebsites
+    case savedPasswords
 
     var requiresPremium: Bool { true }
 }

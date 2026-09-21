@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		11E069EE2FB27C7C00C33337 /* ContentBlockerExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 11E069E52FB27C7C00C33337 /* ContentBlockerExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		11E069FC2FB282BD00C33337 /* ApphudSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 11E069FB2FB282BD00C33337 /* ApphudSDK */; };
+		11E06A032FB3B00100C33337 /* AppsFlyerLib-Dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 11E06A022FB3B00100C33337 /* AppsFlyerLib-Dynamic */; };
+		11E06A062FB3B00100C33337 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 11E06A052FB3B00100C33337 /* GoogleMobileAds */; };
+		11E06A0B2FB3B00100C33337 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 11E06A082FB3B00100C33337 /* AppMetricaCore */; };
+		11E06A0C2FB3B00100C33337 /* AppMetricaAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 11E06A092FB3B00100C33337 /* AppMetricaAnalytics */; };
+		11E06A0D2FB3B00100C33337 /* AppMetricaAdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 11E06A0A2FB3B00100C33337 /* AppMetricaAdSupport */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +46,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		11E06A202FB3B20000C33337 /* Exceptions for "AdBlocker Pro" folder in "AdBlocker Pro" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 11E0696F2FB2647A00C33337 /* AdBlocker Pro */;
+		};
 		11E069F22FB27C7C00C33337 /* Exceptions for "ContentBlockerExtension" folder in "ContentBlockerExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -53,6 +65,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		11E069722FB2647A00C33337 /* AdBlocker Pro */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				11E06A202FB3B20000C33337 /* Exceptions for "AdBlocker Pro" folder in "AdBlocker Pro" target */,
+			);
 			path = "AdBlocker Pro";
 			sourceTree = "<group>";
 		};
@@ -72,6 +87,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				11E069FC2FB282BD00C33337 /* ApphudSDK in Frameworks */,
+				11E06A032FB3B00100C33337 /* AppsFlyerLib-Dynamic in Frameworks */,
+				11E06A062FB3B00100C33337 /* GoogleMobileAds in Frameworks */,
+				11E06A0B2FB3B00100C33337 /* AppMetricaCore in Frameworks */,
+				11E06A0C2FB3B00100C33337 /* AppMetricaAnalytics in Frameworks */,
+				11E06A0D2FB3B00100C33337 /* AppMetricaAdSupport in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,6 +146,11 @@
 			name = "AdBlocker Pro";
 			packageProductDependencies = (
 				11E069FB2FB282BD00C33337 /* ApphudSDK */,
+				11E06A022FB3B00100C33337 /* AppsFlyerLib-Dynamic */,
+				11E06A052FB3B00100C33337 /* GoogleMobileAds */,
+				11E06A082FB3B00100C33337 /* AppMetricaCore */,
+				11E06A092FB3B00100C33337 /* AppMetricaAnalytics */,
+				11E06A0A2FB3B00100C33337 /* AppMetricaAdSupport */,
 			);
 			productName = "AdBlocker Pro";
 			productReference = 11E069702FB2647A00C33337 /* AdBlocker Pro.app */;
@@ -161,7 +186,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2640;
-				LastUpgradeCheck = 2640;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					11E0696F2FB2647A00C33337 = {
 						CreatedOnToolsVersion = 26.4.1;
@@ -185,6 +210,9 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				11E069FA2FB282BD00C33337 /* XCRemoteSwiftPackageReference "ApphudSDK" */,
+				11E06A012FB3B00100C33337 /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Dynamic" */,
+				11E06A042FB3B00100C33337 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				11E06A072FB3B00100C33337 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 11E069712FB2647A00C33337 /* Products */;
@@ -275,6 +303,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = CZPS8FB75D;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -339,6 +368,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = CZPS8FB75D;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -368,14 +398,17 @@
 				CODE_SIGN_ENTITLEMENTS = "AdBlocker Pro/AdBlocker Pro.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = CZPS8FB75D;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "AdBlocker Pro/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "AdBlocker Pro uses Face ID to protect your saved passwords";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "It will help us to provide you a more personalized experience, relevant content and promotions.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -416,14 +449,17 @@
 				CODE_SIGN_ENTITLEMENTS = "AdBlocker Pro/AdBlocker Pro.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = CZPS8FB75D;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "AdBlocker Pro/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "AdBlocker Pro uses Face ID to protect your saved passwords";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "It will help us to provide you a more personalized experience, relevant content and promotions.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -566,6 +602,30 @@
 				minimumVersion = 4.0.4;
 			};
 		};
+		11E06A012FB3B00100C33337 /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Dynamic" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Dynamic";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 6.17.8;
+			};
+		};
+		11E06A042FB3B00100C33337 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.9.0;
+			};
+		};
+		11E06A072FB3B00100C33337 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.2.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -573,6 +633,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 11E069FA2FB282BD00C33337 /* XCRemoteSwiftPackageReference "ApphudSDK" */;
 			productName = ApphudSDK;
+		};
+		11E06A022FB3B00100C33337 /* AppsFlyerLib-Dynamic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11E06A012FB3B00100C33337 /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Dynamic" */;
+			productName = "AppsFlyerLib-Dynamic";
+		};
+		11E06A052FB3B00100C33337 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11E06A042FB3B00100C33337 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		11E06A082FB3B00100C33337 /* AppMetricaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11E06A072FB3B00100C33337 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaCore;
+		};
+		11E06A092FB3B00100C33337 /* AppMetricaAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11E06A072FB3B00100C33337 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaAnalytics;
+		};
+		11E06A0A2FB3B00100C33337 /* AppMetricaAdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11E06A072FB3B00100C33337 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaAdSupport;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

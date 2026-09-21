@@ -4,6 +4,7 @@ struct OnboardingView: View {
 
     var appState = AppState.shared
     @State private var currentPage = 0
+    @State private var isFinishing = false
 
     private let pages: [OnboardingPage] = [
         OnboardingPage(
@@ -43,6 +44,7 @@ struct OnboardingView: View {
                         Button(String(localized: "Skip")) {
                             completeOnboarding()
                         }
+                        .disabled(isFinishing)
                         .font(AppTheme.bodyMedium)
                         .foregroundColor(AppTheme.tertiaryText)
                         .padding()
@@ -157,12 +159,16 @@ struct OnboardingView: View {
                 }
             } label: {
                 HStack(spacing: AppTheme.spacingS) {
-                    Text(currentPage < pages.count - 1
-                         ? String(localized: "Continue")
-                         : String(localized: "Get Started"))
-                        .font(AppTheme.bodyMedium)
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 14, weight: .semibold))
+                    if isFinishing {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text(currentPage < pages.count - 1
+                             ? String(localized: "Continue")
+                             : String(localized: "Get Started"))
+                            .font(AppTheme.bodyMedium)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -177,14 +183,23 @@ struct OnboardingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
                 .shadow(color: AppTheme.accent.opacity(0.3), radius: 15, y: 8)
             }
+            .disabled(isFinishing)
             .padding(.horizontal, AppTheme.spacingL)
         }
         .padding(.bottom, AppTheme.spacingXL)
     }
 
     private func completeOnboarding() {
+        guard !isFinishing else { return }
+        isFinishing = true
         HapticManager.impact(.medium)
-        appState.hasCompletedOnboarding = true
+        Task {
+            await AppsFlyerService.shared.requestATTPermission()
+            await ConsentService.shared.prepareAdsIfNeeded()
+            await MainActor.run {
+                appState.hasCompletedOnboarding = true
+            }
+        }
     }
 }
 

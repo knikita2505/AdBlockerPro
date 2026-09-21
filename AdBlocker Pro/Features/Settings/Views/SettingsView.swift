@@ -9,6 +9,8 @@ struct SettingsView: View {
     @Bindable var passcodeService = PasscodeService.shared
 
     @State private var showResetConfirmation = false
+    @State private var isRestoring = false
+    @State private var restoreMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -18,6 +20,9 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: AppTheme.spacingM) {
                         subscriptionCard
+                        if !subscriptionManager.isPremium {
+                            restoreCard
+                        }
                         safariCard
                         securityCard
                         dataCard
@@ -32,6 +37,14 @@ struct SettingsView: View {
             }
             .navigationTitle(String(localized: "Settings"))
             .navigationBarTitleDisplayMode(.inline)
+            .alert(String(localized: "Restore Purchases"), isPresented: Binding(
+                get: { restoreMessage != nil },
+                set: { if !$0 { restoreMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) { restoreMessage = nil }
+            } message: {
+                Text(restoreMessage ?? "")
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Done")) { dismiss() }
@@ -87,6 +100,36 @@ struct SettingsView: View {
             .cardStyle()
         }
         .pressable()
+    }
+
+    // MARK: - Restore
+
+    private var restoreCard: some View {
+        Button {
+            guard !isRestoring else { return }
+            isRestoring = true
+            Task {
+                let restored = await subscriptionManager.restorePurchases()
+                isRestoring = false
+                restoreMessage = restored
+                    ? String(localized: "Purchases restored.")
+                    : String(localized: "No active subscription found.")
+            }
+        } label: {
+            HStack(spacing: AppTheme.spacingM) {
+                settingsIcon(name: "arrow.clockwise", color: AppTheme.accent)
+                Text(String(localized: "Restore Purchases"))
+                    .font(AppTheme.bodyFont)
+                    .foregroundStyle(AppTheme.primaryText)
+                Spacer()
+                if isRestoring {
+                    ProgressView()
+                }
+            }
+            .cardStyle()
+        }
+        .pressable()
+        .disabled(isRestoring)
     }
 
     // MARK: - Safari
@@ -207,7 +250,7 @@ struct SettingsView: View {
     private var linksCard: some View {
         VStack(spacing: 0) {
             Button {
-                if let url = URL(string: "mailto:support@example.com") {
+                if let url = URL(string: "mailto:\(PaywallConstants.supportEmail)") {
                     openURL(url)
                 }
             } label: {

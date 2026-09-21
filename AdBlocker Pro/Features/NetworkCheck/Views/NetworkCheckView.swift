@@ -28,6 +28,10 @@ struct NetworkCheckView: View {
             }
             .background(GradientBackground())
             .navigationBarHidden(true)
+            .onChange(of: service.scanComplete) { _, completed in
+                guard completed else { return }
+                Task { await AdPresentationService.shared.showAfterScanIfNeeded() }
+            }
         }
     }
 

@@ -7,6 +7,7 @@ struct PaywallView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var vm: PaywallViewModel
+    @State private var pulse = false
 
     let placement: PaywallPlacement
 
@@ -15,48 +16,133 @@ struct PaywallView: View {
         self._vm = State(wrappedValue: PaywallViewModel(placement: placement))
     }
 
-    private let features: [(icon: String, title: String)] = [
-        ("nosign", String(localized: "Block All Ads")),
-        ("eye.slash.fill", String(localized: "Tracker Protection")),
-        ("xmark.rectangle.fill", String(localized: "Cookie Banner Cleaner")),
-        ("exclamationmark.shield.fill", String(localized: "Content Filters")),
-        ("globe", String(localized: "Custom Website Lists")),
-        ("key.fill", String(localized: "Secure Password Manager"))
+    private let features: [(color: Color, icon: String, title: String, subtitle: String)] = [
+        (
+            Color(hex: "3B82F6"),
+            "hand.raised.fill",
+            String(localized: "Block ads and speed up page loading"),
+            String(localized: "Block annoying ads and enjoy faster browsing")
+        ),
+        (
+            Color(hex: "F59E0B"),
+            "eye.slash.fill",
+            String(localized: "Stop trackers in Safari"),
+            String(localized: "Prevent websites from tracking your activity")
+        ),
+        (
+            Color(hex: "10B981"),
+            "wifi",
+            String(localized: "Check your Wi-Fi privacy"),
+            String(localized: "Scan the network you are connected to")
+        ),
+        (
+            Color(hex: "A78BFA"),
+            "lock.fill",
+            String(localized: "Save strong passwords"),
+            String(localized: "Keep logins in a protected vault")
+        )
     ]
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: AppTheme.spacingL) {
-                    headerSection
-                    featuresSection
+        ZStack {
+            Color.white.ignoresSafeArea()
 
-                    if vm.isLoadingProducts {
-                        ProgressView()
-                            .frame(height: 120)
-                    } else if let error = vm.loadingError, !vm.hasAnyProduct {
-                        errorSection(error)
-                    } else {
-                        plansSection
-                    }
-
-                    purchaseButton
-                    footerLinks
-                }
-                .padding(.horizontal, AppTheme.spacingL)
-                .padding(.bottom, AppTheme.spacingXL)
-            }
-            .background(AppTheme.background)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title3)
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(AppTheme.tertiaryText)
+                            .frame(width: 32, height: 32)
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        Image(systemName: "shield.fill")
+                            .font(.system(size: 44, weight: .medium))
+                            .foregroundStyle(AppTheme.accent)
+                            .padding(.top, 8)
+
+                        Text(String(localized: "Ad blocking and Wi-Fi security is ready to protect your device"))
+                            .font(.system(size: 26, weight: .bold, design: .rounded))
+                            .foregroundStyle(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 12)
+
+                        Text(vm.trialPriceLine)
+                            .font(AppTheme.bodyFont)
+                            .foregroundStyle(AppTheme.tertiaryText)
+                            .multilineTextAlignment(.center)
+
+                        VStack(alignment: .leading, spacing: 16) {
+                            ForEach(Array(features.enumerated()), id: \.offset) { _, item in
+                                HStack(alignment: .top, spacing: 12) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                            .fill(item.color.opacity(0.15))
+                                            .frame(width: 40, height: 40)
+                                        Image(systemName: item.icon)
+                                            .font(.system(size: 16, weight: .semibold))
+                                            .foregroundStyle(item.color)
+                                    }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(item.title)
+                                            .font(AppTheme.bodyMedium)
+                                            .foregroundStyle(AppTheme.primaryText)
+                                        Text(item.subtitle)
+                                            .font(AppTheme.captionFont)
+                                            .foregroundStyle(AppTheme.secondaryText)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 8)
+                    }
+                    .padding(.bottom, 12)
+                }
+
+                Spacer(minLength: 8)
+
+                Button {
+                    vm.select(.weekly)
+                    vm.purchaseSelected()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.accent.opacity(0.12))
+                            .frame(width: 188, height: 188)
+                            .scaleEffect(pulse ? 1.08 : 1.0)
+                        Circle()
+                            .fill(AppTheme.accent.opacity(0.18))
+                            .frame(width: 156, height: 156)
+                            .scaleEffect(pulse ? 1.05 : 1.0)
+                        Circle()
+                            .fill(AppTheme.accent)
+                            .frame(width: 124, height: 124)
+                            .shadow(color: AppTheme.accent.opacity(0.35), radius: 16, y: 8)
+                        if vm.isPurchasing {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text(String(localized: "START"))
+                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                        }
+                    }
+                }
+                .disabled(vm.isPurchasing || vm.isLoadingProducts)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
+                        pulse = true
+                    }
+                }
+
+                footerLinks
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
             }
         }
         .onAppear { vm.onAppear() }
@@ -73,404 +159,15 @@ struct PaywallView: View {
         }
     }
 
-    // MARK: - Header
-
-    private var headerSection: some View {
-        VStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                Circle()
-                    .fill(AppTheme.accent.opacity(0.12))
-                    .frame(width: 100, height: 100)
-                Image(systemName: "shield.checkered")
-                    .font(.system(size: 44, weight: .medium))
-                    .foregroundStyle(AppTheme.accent)
-            }
-            .padding(.top, AppTheme.spacingL)
-
-            Text(String(localized: "Unlock Full Protection"))
-                .font(.title.bold())
-
-            Text(String(localized: "Get complete Safari protection with premium features"))
-                .font(AppTheme.bodyFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-        }
-    }
-
-    // MARK: - Features
-
-    private var featuresSection: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(features.enumerated()), id: \.offset) { _, feature in
-                HStack(spacing: AppTheme.spacingM) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(AppTheme.accent)
-                    Text(feature.title)
-                        .font(AppTheme.bodyFont)
-                    Spacer()
-                }
-                .padding(.vertical, 10)
-            }
-        }
-        .padding(AppTheme.spacingM)
-        .background(AppTheme.secondaryGroupedBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
-    }
-
-    // MARK: - Error
-
-    private func errorSection(_ error: PaywallError) -> some View {
-        VStack(spacing: AppTheme.spacingM) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.largeTitle)
-                .foregroundStyle(AppTheme.warning)
-            Text(error.title)
-                .font(AppTheme.headlineFont)
-            Text(error.message)
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-            Button(String(localized: "Try Again")) { vm.retryLoadProducts() }
-                .font(AppTheme.headlineFont)
-                .tint(AppTheme.accent)
-        }
-        .padding(.vertical, AppTheme.spacingL)
-    }
-
-    // MARK: - Plans
-
-    private var plansSection: some View {
-        VStack(spacing: AppTheme.spacingS) {
-            PaywallPlanCard(
-                title: vm.weeklyTitle,
-                price: vm.weeklyPriceText,
-                detail: vm.isTrialEligible
-                    ? String(localized: "3-day free trial, then auto-renews")
-                    : String(localized: "Cancel anytime"),
-                badge: vm.isTrialEligible ? String(localized: "Free Trial") : nil,
-                isSelected: vm.selectedPlan == .weekly
-            ) { vm.select(.weekly) }
-
-            PaywallPlanCard(
-                title: String(localized: "Yearly"),
-                price: vm.yearlyPriceText,
-                detail: vm.yearlyPerWeekText ?? String(localized: "Best value"),
-                badge: String(localized: "Best Value"),
-                isSelected: vm.selectedPlan == .yearly
-            ) { vm.select(.yearly) }
-        }
-    }
-
-    // MARK: - Purchase Button
-
-    private var purchaseButton: some View {
-        VStack(spacing: AppTheme.spacingS) {
-            Button {
-                vm.purchaseSelected()
-            } label: {
-                ZStack {
-                    if vm.isPurchasing {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text(vm.isTrialEligible && vm.selectedPlan == .weekly
-                             ? String(localized: "Start Free Trial")
-                             : String(localized: "Subscribe Now"))
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(AppTheme.accent)
-                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
-            }
-            .disabled(vm.isPurchasing || vm.isLoadingProducts || !vm.hasAnyProduct)
-
-            HStack(spacing: AppTheme.spacingM) {
-                Text(String(localized: "Cancel anytime"))
-                    .font(AppTheme.captionFont)
-                    .foregroundStyle(AppTheme.secondaryText)
-                Image(systemName: "checkmark.shield.fill")
-                    .font(.caption2)
-                    .foregroundStyle(AppTheme.secondaryText)
-            }
-
-            Button {
-                vm.restore()
-            } label: {
-                Text(String(localized: "Restore Purchases"))
-                    .font(AppTheme.footnoteFont)
-                    .foregroundStyle(AppTheme.secondaryText)
-            }
-        }
-    }
-
-    // MARK: - Footer
-
     private var footerLinks: some View {
-        HStack(spacing: AppTheme.spacingM) {
+        HStack(spacing: 16) {
             Link(String(localized: "Terms of Use"), destination: URL(string: PaywallConstants.termsURL)!)
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.tertiaryText)
-            Text("•").foregroundStyle(AppTheme.tertiaryText)
+            Button(String(localized: "Restore")) { vm.restore() }
             Link(String(localized: "Privacy Policy"), destination: URL(string: PaywallConstants.privacyURL)!)
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.tertiaryText)
         }
+        .font(AppTheme.captionFont)
+        .foregroundStyle(AppTheme.tertiaryText)
     }
-}
-
-// MARK: - Plan Card
-
-private struct PaywallPlanCard: View {
-    let title: String
-    let price: String?
-    let detail: String
-    let badge: String?
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(title)
-                            .font(AppTheme.headlineFont)
-                            .foregroundStyle(AppTheme.primaryText)
-                        if let badge {
-                            Text(badge)
-                                .font(.caption2.bold())
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(AppTheme.accent)
-                                .clipShape(Capsule())
-                        }
-                    }
-                    Text(detail)
-                        .font(AppTheme.captionFont)
-                        .foregroundStyle(AppTheme.secondaryText)
-                }
-                Spacer()
-                if let price {
-                    Text(price)
-                        .font(AppTheme.headlineFont)
-                        .foregroundStyle(AppTheme.primaryText)
-                }
-            }
-            .padding(AppTheme.spacingM)
-            .background(AppTheme.secondaryGroupedBackground)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM))
-            .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.cornerRadiusM)
-                    .stroke(isSelected ? AppTheme.accent : .clear, lineWidth: 2)
-            )
-        }
-    }
-}
-
-// MARK: - ViewModel
-
-@Observable
-final class PaywallViewModel {
-
-    let placement: PaywallPlacement
-
-    var selectedPlan: PaywallSubscriptionPlan = .weekly
-    var isPurchasing = false
-    var showError = false
-    var errorMessage: String?
-    var purchaseSuccessful = false
-
-    private(set) var weeklyProduct: ApphudProduct?
-    private(set) var yearlyProduct: ApphudProduct?
-    private var weeklyStoreProduct: Product?
-    private var yearlyStoreProduct: Product?
-    var isTrialEligible = false
-    var isLoadingProducts = true
-    var loadingError: PaywallError?
-
-    private var currentPaywall: ApphudPaywall?
-
-    init(placement: PaywallPlacement = .onboarding) {
-        self.placement = placement
-    }
-
-    var hasAnyProduct: Bool { weeklyProduct != nil || yearlyProduct != nil }
-
-    var weeklyTitle: String {
-        isTrialEligible ? String(localized: "Weekly + Free Trial") : String(localized: "Weekly")
-    }
-
-    var weeklyPriceText: String? {
-        guard let p = weeklyStoreProduct else { return nil }
-        return isTrialEligible
-            ? String(localized: "then \(p.displayPrice)/wk")
-            : String(localized: "\(p.displayPrice)/wk")
-    }
-
-    var yearlyPriceText: String? {
-        guard let p = yearlyStoreProduct else { return nil }
-        return String(localized: "\(p.displayPrice)/yr")
-    }
-
-    var yearlyPerWeekText: String? {
-        guard let p = yearlyStoreProduct else { return nil }
-        let weekly = p.price / 52
-        return String(localized: "\(weekly.formatted(p.priceFormatStyle))/week")
-    }
-
-    func onAppear() {
-        loadProducts()
-    }
-
-    func retryLoadProducts() {
-        loadProducts()
-    }
-
-    func select(_ plan: PaywallSubscriptionPlan) {
-        withAnimation(.easeInOut(duration: 0.2)) { selectedPlan = plan }
-    }
-
-    func purchaseSelected() {
-        let product: ApphudProduct? = selectedPlan == .weekly ? weeklyProduct : yearlyProduct
-        guard let product else {
-            showErr(String(localized: "Unable to load subscription. Please check your connection."))
-            return
-        }
-
-        isPurchasing = true
-        Apphud.purchase(product) { [weak self] result in
-            Task { @MainActor in
-                guard let self else { return }
-                self.isPurchasing = false
-                if result.success {
-                    self.purchaseSuccessful = true
-                } else {
-                    self.showErr(self.friendlyError(result.error))
-                }
-            }
-        }
-    }
-
-    func restore() {
-        isPurchasing = true
-        Apphud.restorePurchases { [weak self] result in
-            Task { @MainActor in
-                guard let self else { return }
-                self.isPurchasing = false
-                if Apphud.hasActiveSubscription() {
-                    self.purchaseSuccessful = true
-                } else {
-                    self.showErr(String(localized: "No active subscription found."))
-                }
-            }
-        }
-    }
-
-    // MARK: - Private
-
-    private func loadProducts() {
-        isLoadingProducts = true
-        loadingError = nil
-
-        Apphud.fetchPlacements { [weak self] placements, error in
-            guard let self else { return }
-            Task { @MainActor in
-                guard let found = placements.first(where: { $0.identifier == self.placement.identifier }),
-                      let paywall = found.paywall else {
-                    self.isLoadingProducts = false
-                    self.loadingError = .productsNotAvailable
-                    return
-                }
-
-                self.currentPaywall = paywall
-                Apphud.paywallShown(paywall)
-
-                self.weeklyProduct = paywall.products.first { $0.productId == PaywallConstants.weeklyProductId }
-                self.yearlyProduct = paywall.products.first { $0.productId == PaywallConstants.yearlyProductId }
-
-                if self.weeklyProduct == nil, self.yearlyProduct != nil {
-                    self.selectedPlan = .yearly
-                }
-
-                await self.refreshStoreKitProducts()
-                await self.updateTrialEligibility()
-                self.isLoadingProducts = false
-            }
-        }
-    }
-
-    private func refreshStoreKitProducts() async {
-        weeklyStoreProduct = try? await weeklyProduct?.product()
-        yearlyStoreProduct = try? await yearlyProduct?.product()
-    }
-
-    private func updateTrialEligibility() async {
-        guard let product = weeklyStoreProduct,
-              product.subscription?.introductoryOffer != nil else {
-            isTrialEligible = false
-            return
-        }
-        isTrialEligible = await product.subscription?.isEligibleForIntroOffer ?? false
-    }
-
-    private func showErr(_ msg: String) {
-        errorMessage = msg
-        showError = true
-    }
-
-    private func friendlyError(_ error: Error?) -> String {
-        guard let error else { return String(localized: "Purchase could not be completed.") }
-        let code = (error as NSError).code
-        switch code {
-        case 2: return String(localized: "Purchase was cancelled.")
-        case 4: return String(localized: "Purchases are not allowed on this device.")
-        case 7: return String(localized: "Could not connect to the App Store. Check your internet.")
-        default:
-            if (error as NSError).domain == NSURLErrorDomain {
-                return String(localized: "No internet connection.")
-            }
-            return String(localized: "Purchase failed. Please try again.")
-        }
-    }
-}
-
-// MARK: - Types
-
-enum PaywallSubscriptionPlan: String {
-    case weekly, yearly
-}
-
-enum PaywallError {
-    case productsNotAvailable
-    case noInternet
-
-    var title: String {
-        switch self {
-        case .productsNotAvailable: return String(localized: "Products Unavailable")
-        case .noInternet: return String(localized: "No Connection")
-        }
-    }
-
-    var message: String {
-        switch self {
-        case .productsNotAvailable: return String(localized: "Subscriptions are temporarily unavailable. Please try again later.")
-        case .noInternet: return String(localized: "Please check your internet connection.")
-        }
-    }
-}
-
-// MARK: - Constants
-
-enum PaywallConstants {
-    static let weeklyProductId = "adblocker.premium.week1"
-    static let yearlyProductId = "adblocker.premium.year1"
-
-    static let termsURL = "https://example.com/terms"
-    static let privacyURL = "https://example.com/privacy"
 }
 
 #Preview {

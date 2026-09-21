@@ -4,6 +4,7 @@ struct SavedPasswordsSection: View {
 
     var storage = PasswordStorageService.shared
     @State private var showAddSheet = false
+    @State private var selectedEntry: PasswordEntry?
 
     var body: some View {
         VStack(spacing: AppTheme.spacingM) {
@@ -17,6 +18,9 @@ struct SavedPasswordsSection: View {
         }
         .sheet(isPresented: $showAddSheet) {
             PasswordEditView(mode: .add)
+        }
+        .navigationDestination(item: $selectedEntry) { entry in
+            PasswordDetailView(entry: entry)
         }
     }
 
@@ -49,6 +53,7 @@ struct SavedPasswordsSection: View {
             Spacer()
 
             Button {
+                guard SubscriptionManager.shared.requirePremium(for: .savedPasswords) else { return }
                 HapticManager.impact(.light)
                 showAddSheet = true
             } label: {
@@ -103,8 +108,9 @@ struct SavedPasswordsSection: View {
     private var passwordsList: some View {
         VStack(spacing: 0) {
             ForEach(Array(storage.entries.enumerated()), id: \.element.id) { index, entry in
-                NavigationLink {
-                    PasswordDetailView(entry: entry)
+                Button {
+                    guard SubscriptionManager.shared.requirePremium(for: .savedPasswords) else { return }
+                    selectedEntry = entry
                 } label: {
                     HStack(spacing: AppTheme.spacingM) {
                         ZStack {
@@ -134,7 +140,9 @@ struct SavedPasswordsSection: View {
                     }
                     .padding(.horizontal, AppTheme.spacingM)
                     .padding(.vertical, 12)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
 
                 if index < storage.entries.count - 1 {
                     Divider().padding(.leading, 72)
@@ -341,6 +349,9 @@ struct PasswordEditView: View {
     }
 
     private func save() {
+        if case .add = mode {
+            guard SubscriptionManager.shared.requirePremium(for: .savedPasswords) else { return }
+        }
         switch mode {
         case .add:
             let entry = PasswordEntry(

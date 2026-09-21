@@ -20,8 +20,31 @@ struct MainTabView: View {
             }
         }
         .tint(AppTheme.accent)
-        .fullScreenCover(isPresented: $subscriptionManager.showPaywall) {
-            PaywallView(placement: subscriptionManager.currentPlacement)
+        .task {
+            await ConsentService.shared.prepareAdsAfterTrackingDecision()
+        }
+        .fullScreenCover(isPresented: $subscriptionManager.showPaywall, onDismiss: {
+            Task { await handlePaywallDismissed() }
+        }) {
+            if subscriptionManager.currentPlacement == .onboarding {
+                PaywallView(placement: subscriptionManager.currentPlacement)
+            } else {
+                PremiumPaywallView(placement: subscriptionManager.currentPlacement)
+            }
+        }
+        .fullScreenCover(isPresented: $appState.showSafariSetupGuide) {
+            SafariSetupGuideView()
+        }
+    }
+
+    private func handlePaywallDismissed() async {
+        await AdPresentationService.shared.showAfterPaywallIfNeeded()
+        guard appState.pendingSafariSetupAfterPaywall else { return }
+        appState.pendingSafariSetupAfterPaywall = false
+        if !appState.hasShownSafariSetupAfterOnboarding {
+            appState.hasShownSafariSetupAfterOnboarding = true
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            appState.showSafariSetupGuide = true
         }
     }
 }

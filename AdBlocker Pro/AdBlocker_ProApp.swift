@@ -1,10 +1,3 @@
-//
-//  AdBlocker_ProApp.swift
-//  AdBlocker Pro
-//
-//  Created by Nikita on 11/05/2026.
-//
-
 import SwiftUI
 import ApphudSDK
 
@@ -15,7 +8,9 @@ struct AdBlocker_ProApp: App {
     @State private var subscriptionManager = SubscriptionManager.shared
 
     init() {
-        Apphud.start(apiKey: "app_8861UZSwNCVX4Q2BGRXtDD6PKobhSA")
+        Apphud.start(apiKey: SDKConfig.apphudAPIKey)
+        AppsFlyerService.shared.configure()
+        AppMetricaService.shared.activate()
         configureAppearance()
     }
 
@@ -35,11 +30,21 @@ struct AdBlocker_ProApp: App {
                 subscriptionManager.checkSubscriptionStatus()
             }
             .onChange(of: appState.hasCompletedOnboarding) { _, completed in
-                if completed {
-                    subscriptionManager.currentPlacement = .onboarding
-                    subscriptionManager.showPaywall = true
+                guard completed else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                    startFirstLaunchPaywallIfNeeded()
                 }
             }
+        }
+    }
+
+    private func startFirstLaunchPaywallIfNeeded() {
+        if !subscriptionManager.isPremium {
+            appState.pendingSafariSetupAfterPaywall = true
+            subscriptionManager.showPaywall(for: .onboarding)
+        } else if !appState.hasShownSafariSetupAfterOnboarding {
+            appState.hasShownSafariSetupAfterOnboarding = true
+            appState.showSafariSetupGuide = true
         }
     }
 
