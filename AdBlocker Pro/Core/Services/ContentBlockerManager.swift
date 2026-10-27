@@ -10,7 +10,7 @@ final class ContentBlockerManager {
 
     static let shared = ContentBlockerManager()
 
-    static let appGroupIdentifier = "group.nikita.ka.AdBlocker-Pro"
+    static let appGroupIdentifier = "group.nikita.ka.AdBlocker-Pro.ContentBlockerExt"
     static let extensionBundleIdentifier = "nikita.ka.AdBlocker-Pro.ContentBlockerExtension"
     static let rulesFileName = "blockerList.json"
 
@@ -55,6 +55,7 @@ final class ContentBlockerManager {
             return
         }
 
+        guard SubscriptionManager.shared.isPremium else { return }
         guard isExtensionEnabled else { return }
 
         if let last = UserDefaults.standard.stringArray(forKey: lastFiltersKey),
@@ -68,21 +69,26 @@ final class ContentBlockerManager {
 
     // MARK: - Extension Status
 
-    func checkExtensionStatus() async {
+    @discardableResult
+    func checkExtensionStatus() async -> Bool? {
         #if os(iOS)
         do {
             let state = try await SFContentBlockerManager.stateOfContentBlocker(
                 withIdentifier: Self.extensionBundleIdentifier
             )
+            let enabled = state.isEnabled
             await MainActor.run {
-                isExtensionEnabled = state.isEnabled
-                if !state.isEnabled {
+                isExtensionEnabled = enabled
+                if !enabled {
                     deactivateProtectionIfNeeded()
                 }
             }
+            return enabled
         } catch {
-            await MainActor.run { isExtensionEnabled = false }
+            return nil
         }
+        #else
+        return nil
         #endif
     }
 
@@ -95,9 +101,15 @@ final class ContentBlockerManager {
         Task { await rebuildAndReload() }
     }
 
+    func enforceSubscriptionAccess() {
+        guard !SubscriptionManager.shared.isPremium else { return }
+        deactivateProtectionIfNeeded()
+    }
+
     func toggleFilter(_ category: FilterCategory, isOn: Bool) {
-        guard isExtensionEnabled || !isOn else { return }
         if isOn {
+            guard SubscriptionManager.shared.isPremium else { return }
+            guard isExtensionEnabled else { return }
             enabledFilters.insert(category)
         } else {
             enabledFilters.remove(category)

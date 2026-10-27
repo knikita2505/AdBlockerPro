@@ -10,7 +10,7 @@ final class SubscriptionManager {
 
     private(set) var isPremium: Bool = false
     var showPaywall: Bool = false
-    var currentPlacement: PaywallPlacement = .onboarding
+    var currentPlacement: PaywallPlacement = .launch
 
     private init() {
         checkSubscriptionStatus()
@@ -28,7 +28,7 @@ final class SubscriptionManager {
 
     // MARK: - Premium Gating
 
-    func requirePremium(for feature: PremiumFeature, placement: PaywallPlacement = .premiumFeature) -> Bool {
+    func requirePremium(for feature: PremiumFeature, placement: PaywallPlacement = .premiumFeatures) -> Bool {
         guard feature.requiresPremium else { return true }
         if isPremium { return true }
         showPaywall(for: placement)
@@ -98,10 +98,13 @@ final class SubscriptionManager {
 // MARK: - Paywall Placement
 
 enum PaywallPlacement: String {
-    case onboarding = "onboarding"
-    case premiumFeature = "premium_feature"
+    case launch = "safeguard_launch"
+    case premiumFeatures = "safeguard_premium_features"
 
     var identifier: String { rawValue }
+
+    /// Идентификатор пейволла в Apphud совпадает с плейсментом.
+    var paywallIdentifier: String { rawValue }
 }
 
 // MARK: - Premium Feature

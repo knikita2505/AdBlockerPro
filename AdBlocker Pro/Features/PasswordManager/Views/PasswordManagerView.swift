@@ -168,6 +168,11 @@ struct PasswordManagerHomeView: View {
                 HStack(spacing: AppTheme.spacingS) {
                     ForEach(PasswordSection.allCases, id: \.self) { section in
                         Button {
+                            if section == .saved, !SubscriptionManager.shared.isPremium {
+                                HapticManager.impact(.light)
+                                SubscriptionManager.shared.showPaywall(for: .premiumFeatures)
+                                return
+                            }
                             withAnimation(.spring(response: 0.3)) {
                                 selectedSection = section
                             }

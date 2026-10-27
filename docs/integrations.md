@@ -8,14 +8,23 @@
 
 После ATT: `Apphud.setDeviceIdentifiers(idfa:idfv:)`.
 
-UMP (`ConsentService`) → `MobileAds.start` + `RewardedAdService.preload`, только если `canRequestAds` и не premium.
+UMP (`ConsentService`) → `MobileAds.start` + `InterstitialAdService.preload`, только если `canRequestAds` и не premium.
 
 ## События рекламы
 
-`RewardedAdService.show()` из `AdPresentationService`:
+`InterstitialAdService.show()` из `AdPresentationService`:
 
 - скан сети завершён
-- Generate пароля (не чаще одного раза за сессию)
+- каждый Generate пароля
 - dismiss пейволла, если нет подписки
 
 AppMetrica: только activate + связка с Apphud (без ad revenue и кастомных событий).
+
+## Подписки
+
+Плейсмент и пейволл с одним идентификатором:
+
+- `safeguard_launch` — пейволл при запуске, продукт `safeguard_premium_week`
+- `safeguard_premium_features` — премиум-пейволл, продукты `safeguard_premium_week` и `safeguard_premium_year`
+
+`PaywallViewModel` берёт пейволл из `Apphud.fetchPlacements`, имена — из продукта Apphud, цену и trial — из StoreKit.

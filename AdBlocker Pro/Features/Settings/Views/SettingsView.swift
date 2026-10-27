@@ -61,7 +61,7 @@ struct SettingsView: View {
         Button {
             if !subscriptionManager.isPremium {
                 HapticManager.impact(.light)
-                subscriptionManager.showPaywall(for: .premiumFeature)
+                subscriptionManager.showPaywall(for: .premiumFeatures)
             }
         } label: {
             HStack(spacing: AppTheme.spacingM) {

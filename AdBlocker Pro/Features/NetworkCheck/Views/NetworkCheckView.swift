@@ -50,6 +50,8 @@ struct NetworkCheckView: View {
             }
 
             Spacer()
+
+            ProBadgeButton()
         }
     }
 

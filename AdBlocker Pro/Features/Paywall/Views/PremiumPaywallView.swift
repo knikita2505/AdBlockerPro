@@ -4,45 +4,65 @@ struct PremiumPaywallView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var vm: PaywallViewModel
+    @State private var pulse = false
 
     let placement: PaywallPlacement
 
-    init(placement: PaywallPlacement = .premiumFeature) {
+    init(placement: PaywallPlacement = .premiumFeatures) {
         self.placement = placement
         self._vm = State(wrappedValue: PaywallViewModel(placement: placement))
     }
 
+    private let features: [(icon: String, color: Color, title: String, isAsterisk: Bool)] = [
+        ("hand.raised.fill", Color(hex: "3B82F6"), String(localized: "Block ads and speed up page loading"), false),
+        ("lock.fill", Color(hex: "7C6BF2"), String(localized: "Secure space for your media and contacts"), false),
+        ("safari", Color(hex: "3B82F6"), String(localized: "Browser with protection against phishing"), false),
+        ("", Color(hex: "7C6BF2"), String(localized: "Complex passwords to protect accounts"), true)
+    ]
+
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [Color(hex: "ECFDF5"), Color.white],
-                startPoint: .top,
-                endPoint: .center
-            )
-            .ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 topBar
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 18) {
-                        Text(String(localized: "Ad blocking and Wi-Fi security is ready to protect your device"))
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundStyle(AppTheme.primaryText)
-                            .multilineTextAlignment(.center)
+                    VStack(alignment: .leading, spacing: 22) {
+                        Text(String(localized: "Ads block and wifi security tool is ready to protect your device"))
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(Color(hex: "1A1D21"))
+                            .fixedSize(horizontal: false, vertical: true)
 
-                        Text(vm.trialPriceLine)
-                            .font(AppTheme.bodyFont)
-                            .foregroundStyle(AppTheme.tertiaryText)
+                        hero
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
 
-                        planPicker
-                        trialTimeline
+                        VStack(alignment: .leading, spacing: 16) {
+                            ForEach(Array(features.enumerated()), id: \.offset) { _, item in
+                                featureRow(item)
+                            }
+                        }
+
+                        VStack(spacing: 12) {
+                            planCard(
+                                title: vm.yearlyCardTitle,
+                                price: vm.yearlyCardPrice,
+                                plan: .yearly,
+                                savePercent: vm.yearlySavePercent
+                            )
+                            planCard(
+                                title: vm.weeklyCardTitle,
+                                price: vm.weeklyCardPrice,
+                                plan: .weekly,
+                                savePercent: nil
+                            )
+                        }
+                        .padding(.top, 4)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
+                    .padding(.horizontal, 22)
+                    .padding(.bottom, 12)
                 }
-
-                Spacer(minLength: 8)
 
                 Button {
                     vm.purchaseSelected()
@@ -52,7 +72,7 @@ struct PremiumPaywallView: View {
                             ProgressView().tint(.white)
                         } else {
                             Text(String(localized: "Continue"))
-                                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                .font(.system(size: 18, weight: .semibold))
                                 .foregroundStyle(.white)
                         }
                     }
@@ -62,25 +82,17 @@ struct PremiumPaywallView: View {
                     .clipShape(Capsule())
                 }
                 .disabled(vm.isPurchasing || vm.isLoadingProducts)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 22)
+                .padding(.top, 8)
 
-                HStack(spacing: 6) {
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 11))
-                    Text(String(localized: "Protected by Apple"))
-                        .font(AppTheme.captionFont)
-                }
-                .foregroundStyle(AppTheme.tertiaryText)
-                .padding(.top, 12)
-
-                HStack(spacing: 16) {
+                HStack(spacing: 22) {
                     Link(String(localized: "Terms of Use"), destination: URL(string: PaywallConstants.termsURL)!)
                     Link(String(localized: "Privacy Policy"), destination: URL(string: PaywallConstants.privacyURL)!)
                 }
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.tertiaryText)
-                .padding(.top, 10)
-                .padding(.bottom, 16)
+                .font(.system(size: 13))
+                .foregroundStyle(Color(hex: "9CA3AF"))
+                .padding(.top, 14)
+                .padding(.bottom, 12)
             }
         }
         .onAppear { vm.onAppear() }
@@ -100,111 +112,107 @@ struct PremiumPaywallView: View {
     private var topBar: some View {
         HStack {
             Button { dismiss() } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AppTheme.secondaryText)
-                    .frame(width: 36, height: 36)
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Color.black.opacity(0.08))
+                    .frame(width: 32, height: 32)
             }
             Spacer()
-            Button(String(localized: "Already Purchase?")) {
+            Button(String(localized: "Restore Purchase")) {
                 vm.restore()
             }
-            .font(AppTheme.captionFont)
-            .foregroundStyle(AppTheme.tertiaryText)
-            Spacer()
-            Color.clear.frame(width: 36, height: 36)
+            .font(.system(size: 15))
+            .foregroundStyle(Color(hex: "9CA3AF"))
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 16)
         .padding(.top, 4)
     }
 
-    private var planPicker: some View {
-        ZStack(alignment: .topTrailing) {
-            HStack(spacing: 0) {
-                planTab(title: String(localized: "Weekly"), plan: .weekly)
-                planTab(title: String(localized: "Annual"), plan: .yearly)
-            }
-            .padding(4)
-            .background(Color(hex: "E5E7EB"))
-            .clipShape(Capsule())
-
-            if let percent = vm.yearlySavePercent {
-                Text(String(localized: "SAVE \(percent)%"))
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(hex: "FDBA74"))
-                    .clipShape(Capsule())
-                    .offset(x: -8, y: -12)
+    private var hero: some View {
+        ZStack {
+            Circle()
+                .fill(Color(hex: "E7F8F1"))
+                .frame(width: 176, height: 176)
+                .scaleEffect(pulse ? 1.08 : 1.0)
+            Circle()
+                .fill(Color(hex: "D7F3E6"))
+                .frame(width: 136, height: 136)
+                .scaleEffect(pulse ? 1.05 : 1.0)
+            Circle()
+                .fill(AppTheme.accent)
+                .frame(width: 96, height: 96)
+            Image(systemName: "shield")
+                .font(.system(size: 40, weight: .medium))
+                .foregroundStyle(.white)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
+                pulse = true
             }
         }
-        .padding(.top, 8)
     }
 
-    private func planTab(title: String, plan: PaywallSubscriptionPlan) -> some View {
-        Button {
+    private func featureRow(_ item: (icon: String, color: Color, title: String, isAsterisk: Bool)) -> some View {
+        HStack(spacing: 14) {
+            Group {
+                if item.isAsterisk {
+                    Text("***")
+                        .font(.system(size: 15, weight: .bold))
+                } else {
+                    Image(systemName: item.icon)
+                        .font(.system(size: 18, weight: .semibold))
+                }
+            }
+            .foregroundStyle(item.color)
+            .frame(width: 28, alignment: .center)
+
+            Text(item.title)
+                .font(.system(size: 16))
+                .foregroundStyle(Color(hex: "1A1D21"))
+        }
+    }
+
+    private func planCard(title: String, price: String?, plan: PaywallSubscriptionPlan, savePercent: Int?) -> some View {
+        let isSelected = vm.selectedPlan == plan
+
+        return Button {
             vm.select(plan)
         } label: {
-            Text(title)
-                .font(AppTheme.bodyMedium)
-                .foregroundStyle(vm.selectedPlan == plan ? AppTheme.primaryText : AppTheme.secondaryText)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(vm.selectedPlan == plan ? Color.white : Color.clear)
-                .clipShape(Capsule())
-        }
-    }
-
-    private var trialTimeline: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            timelineRow(
-                icon: "lock.fill",
-                title: String(localized: "Today"),
-                subtitle: String(localized: "Enjoy unlimited access to ad blocking and Wi-Fi security.")
-            )
-            timelineConnector
-            timelineRow(
-                icon: "bell.fill",
-                title: String(localized: "One day before"),
-                subtitle: String(localized: "We'll remind you when your trial is about to end.")
-            )
-            timelineConnector
-            timelineRow(
-                icon: "sparkles",
-                title: String(localized: "In 3 days"),
-                subtitle: String(localized: "You will be charged, cancel anytime before then")
-            )
-        }
-        .padding(.top, 8)
-    }
-
-    private var timelineConnector: some View {
-        Rectangle()
-            .fill(Color(hex: "93C5FD"))
-            .frame(width: 3, height: 22)
-            .padding(.leading, 18)
-    }
-
-    private func timelineRow(icon: String, title: String, subtitle: String) -> some View {
-        HStack(alignment: .top, spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(Color(hex: "DBEAFE"))
-                    .frame(width: 40, height: 40)
-                Image(systemName: icon)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Color(hex: "3B82F6"))
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title.isEmpty ? " " : title)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color(hex: "1A1D21"))
+                    if vm.isLoadingProducts {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else if let price {
+                        Text(price)
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color(hex: "6B7280"))
+                    }
+                }
+                Spacer(minLength: 8)
+                if let savePercent {
+                    Text(String(localized: "SAVE \(savePercent)%"))
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(Color(hex: "F5A524"))
+                        .clipShape(Capsule())
+                }
             }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(AppTheme.bodyMedium)
-                    .foregroundStyle(AppTheme.primaryText)
-                Text(subtitle)
-                    .font(AppTheme.captionFont)
-                    .foregroundStyle(AppTheme.secondaryText)
-            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(isSelected ? AppTheme.accent : Color.black.opacity(0.12), lineWidth: isSelected ? 1.5 : 1)
+            )
         }
+        .buttonStyle(.plain)
     }
 }
 

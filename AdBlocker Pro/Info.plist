@@ -3,15 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-5315661113522929~5505354919</string>
 	<key>GADDelayAppMeasurementInit</key>
 	<true/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>NSAdvertisingAttributionReportEndpoint</key>
 	<string>https://appsflyer-skadnetwork.com/</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>It will help us to provide you a more personalized experience, relevant content and promotions.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

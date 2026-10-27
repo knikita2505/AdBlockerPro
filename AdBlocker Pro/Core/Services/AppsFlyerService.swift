@@ -82,11 +82,15 @@ final class AppsFlyerService: NSObject, ObservableObject {
 
         return await withCheckedContinuation { continuation in
             ATTrackingManager.requestTrackingAuthorization { [weak self] status in
-                Task { @MainActor in
-                    self?.hasRequestedATT = true
-                    self?.attStatus = status
+                Task { @MainActor [weak self] in
+                    guard let self else {
+                        continuation.resume(returning: status)
+                        return
+                    }
+                    self.hasRequestedATT = true
+                    self.attStatus = status
                     if status == .authorized {
-                        self?.setDeviceIdentifiersToApphud()
+                        self.setDeviceIdentifiersToApphud()
                     }
                     continuation.resume(returning: status)
                 }

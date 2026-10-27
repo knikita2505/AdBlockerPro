@@ -3,7 +3,7 @@ import MobileCoreServices
 
 class ContentBlockerRequestHandler: NSObject, NSExtensionRequestHandling {
 
-    private static let appGroupIdentifier = "group.nikita.ka.AdBlocker-Pro"
+    private static let appGroupIdentifier = "group.nikita.ka.AdBlocker-Pro.ContentBlockerExt"
     private static let rulesFileName = "blockerList.json"
 
     private static let noopRules = "[{\"trigger\":{\"url-filter\":\"://never\\\\.match\\\\.this\\\\.domain\\\\.invalid\"},\"action\":{\"type\":\"block\"}}]"

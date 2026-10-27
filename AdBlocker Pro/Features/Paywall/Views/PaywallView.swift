@@ -11,7 +11,7 @@ struct PaywallView: View {
 
     let placement: PaywallPlacement
 
-    init(placement: PaywallPlacement = .onboarding) {
+    init(placement: PaywallPlacement = .launch) {
         self.placement = placement
         self._vm = State(wrappedValue: PaywallViewModel(placement: placement))
     }
@@ -52,8 +52,8 @@ struct PaywallView: View {
                     Spacer()
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(AppTheme.tertiaryText)
+                            .font(.system(size: 12, weight: .regular))
+                            .foregroundStyle(Color.black.opacity(0.08))
                             .frame(width: 32, height: 32)
                     }
                 }
@@ -62,10 +62,11 @@ struct PaywallView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
-                        Image(systemName: "shield.fill")
-                            .font(.system(size: 44, weight: .medium))
-                            .foregroundStyle(AppTheme.accent)
-                            .padding(.top, 8)
+                        Image("AppShield")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 148, height: 148)
+                            .padding(.top, 4)
 
                         Text(String(localized: "Ad blocking and Wi-Fi security is ready to protect your device"))
                             .font(.system(size: 26, weight: .bold, design: .rounded))
@@ -171,5 +172,5 @@ struct PaywallView: View {
 }
 
 #Preview {
-    PaywallView(placement: .onboarding)
+    PaywallView(placement: .launch)
 }

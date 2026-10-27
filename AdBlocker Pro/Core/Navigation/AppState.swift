@@ -44,4 +44,14 @@ final class AppState {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         self.hasShownSafariSetupAfterOnboarding = UserDefaults.standard.bool(forKey: Self.safariSetupKey)
     }
+
+    @MainActor
+    func presentSafariSetupIfNeeded() async {
+        guard !hasShownSafariSetupAfterOnboarding else { return }
+        let enabled = await ContentBlockerManager.shared.checkExtensionStatus()
+        hasShownSafariSetupAfterOnboarding = true
+        guard enabled == false else { return }
+        try? await Task.sleep(for: .milliseconds(400))
+        showSafariSetupGuide = true
+    }
 }

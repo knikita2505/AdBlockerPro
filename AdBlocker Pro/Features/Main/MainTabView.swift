@@ -26,7 +26,7 @@ struct MainTabView: View {
         .fullScreenCover(isPresented: $subscriptionManager.showPaywall, onDismiss: {
             Task { await handlePaywallDismissed() }
         }) {
-            if subscriptionManager.currentPlacement == .onboarding {
+            if subscriptionManager.currentPlacement == .launch {
                 PaywallView(placement: subscriptionManager.currentPlacement)
             } else {
                 PremiumPaywallView(placement: subscriptionManager.currentPlacement)
@@ -41,11 +41,7 @@ struct MainTabView: View {
         await AdPresentationService.shared.showAfterPaywallIfNeeded()
         guard appState.pendingSafariSetupAfterPaywall else { return }
         appState.pendingSafariSetupAfterPaywall = false
-        if !appState.hasShownSafariSetupAfterOnboarding {
-            appState.hasShownSafariSetupAfterOnboarding = true
-            try? await Task.sleep(nanoseconds: 400_000_000)
-            appState.showSafariSetupGuide = true
-        }
+        await appState.presentSafariSetupIfNeeded()
     }
 }
 

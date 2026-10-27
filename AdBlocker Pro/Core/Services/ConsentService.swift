@@ -20,6 +20,12 @@ final class ConsentService {
 
     func prepareAdsIfNeeded() async {
         guard !SubscriptionManager.shared.isPremium else { return }
+        if isPreparing {
+            while isPreparing {
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+            if didStartMobileAds { return }
+        }
         guard !isPreparing else { return }
         isPreparing = true
         defer { isPreparing = false }
@@ -39,13 +45,19 @@ final class ConsentService {
     }
 
     func startMobileAdsIfAllowed() {
-        guard ConsentInformation.shared.canRequestAds else { return }
+        guard ConsentInformation.shared.canRequestAds else {
+            print("AdMob skipped: UMP canRequestAds = false")
+            return
+        }
         guard !didStartMobileAds else {
-            RewardedAdService.shared.preload()
+            InterstitialAdService.shared.preload()
             return
         }
         didStartMobileAds = true
-        MobileAds.shared.start()
-        RewardedAdService.shared.preload()
+        MobileAds.shared.start { _ in
+            Task { @MainActor in
+                InterstitialAdService.shared.preload()
+            }
+        }
     }
 }

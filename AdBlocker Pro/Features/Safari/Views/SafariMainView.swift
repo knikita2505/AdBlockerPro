@@ -51,7 +51,14 @@ struct SafariMainView: View {
                 SafariSetupGuideView()
             }
             .onAppear {
+                subscriptionManager.checkSubscriptionStatus()
+                contentBlocker.enforceSubscriptionAccess()
                 Task { await contentBlocker.checkExtensionStatus() }
+            }
+            .onChange(of: subscriptionManager.isPremium) { _, isPremium in
+                if !isPremium {
+                    contentBlocker.enforceSubscriptionAccess()
+                }
             }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
@@ -78,6 +85,7 @@ struct SafariMainView: View {
             Spacer()
 
             HStack(spacing: AppTheme.spacingS) {
+                ProBadgeButton()
                 headerButton(icon: "book") {
                     showGuides = true
                 }
@@ -153,6 +161,8 @@ struct SafariMainView: View {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
                         contentBlocker.toggleProtection()
                     }
+                } else if !subscriptionManager.isPremium {
+                    subscriptionManager.showPaywall(for: .premiumFeatures)
                 } else if !contentBlocker.isExtensionEnabled {
                     showExtensionSetup = true
                 } else {
@@ -251,6 +261,10 @@ struct SafariMainView: View {
                         isOn: viewModel.isFilterEnabled(category),
                         isLocked: !subscriptionManager.isPremium
                     ) { newValue in
+                        if newValue && !subscriptionManager.isPremium {
+                            subscriptionManager.showPaywall(for: .premiumFeatures)
+                            return
+                        }
                         if newValue && !contentBlocker.isExtensionEnabled {
                             showExtensionSetup = true
                             return

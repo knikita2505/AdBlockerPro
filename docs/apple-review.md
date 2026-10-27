@@ -4,13 +4,13 @@
 
 - [ ] Убран вечный Premium (`Apphud.hasActiveSubscription()` без `true ||`) — уже в коде
 - [ ] Живые Terms / Privacy / support в `PaywallConstants` (сейчас заглушки `adblockerpro.app`)
-- [ ] Боевые ключи AppsFlyer, AppMetrica, AdMob в `SDKConfig` / `AdMobConfig` / Info.plist
-- [ ] Trial 3 дня на weekly совпадает с App Store Connect и текстом «First 3d free» / таймлайном premium-пейволла
+- [x] Боевые ключи AppsFlyer, AppMetrica, AdMob в `SDKConfig` / `AdMobConfig` / Info.plist
+- [ ] Trial на weekly совпадает с introductory offer в App Store Connect. На пейволле срок и цена берутся из Apphud / StoreKit, не зашиты в текст
 - [ ] Restore: launch paywall, «Already Purchase?» на premium, Settings
 
 ## Guideline 3.1.2
 
-Premium-пейволл: цена, Weekly/Annual, Today / One day before / In 3 days (списание, cancel anytime). Launch: цена/trial над START.
+Premium-пейволл: название продукта из Apphud, цена и период из StoreKit, trial из introductory offer, кнопка Continue. Launch: та же цена и trial над START.
 
 ## Guideline 2.1 / 2.3
 
@@ -18,7 +18,7 @@ Premium-пейволл: цена, Weekly/Annual, Today / One day before / In 3 d
 
 ## Guideline 5.1.1
 
-ATT запрашивается после онбординга и до рекламы/IDFA. Строка: `NSUserTrackingUsageDescription` (локализована).
+ATT запрашивается на экране настройки при запуске, до рекламы и IDFA. Строка: `NSUserTrackingUsageDescription` (локализована).
 
 ## Guideline 5.1.2
 

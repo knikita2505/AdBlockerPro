@@ -2,9 +2,12 @@ import SwiftUI
 import ApphudSDK
 import StoreKit
 import Observation
+import os
 
 @Observable
 final class PaywallViewModel {
+
+    private static let log = Logger(subsystem: "nikita.ka.AdBlocker-Pro", category: "Paywall")
 
     let placement: PaywallPlacement
 
@@ -24,38 +27,43 @@ final class PaywallViewModel {
 
     private var currentPaywall: ApphudPaywall?
 
-    init(placement: PaywallPlacement = .onboarding) {
+    init(placement: PaywallPlacement = .launch) {
         self.placement = placement
     }
 
     var hasAnyProduct: Bool { weeklyProduct != nil || yearlyProduct != nil }
 
-    var weeklyTitle: String {
-        isTrialEligible ? String(localized: "Weekly + Free Trial") : String(localized: "Weekly")
+    var yearlyCardTitle: String {
+        storeDisplayName(apphud: yearlyProduct, store: yearlyStoreProduct)
     }
 
-    var weeklyPriceText: String? {
-        guard let p = weeklyStoreProduct else { return nil }
-        return isTrialEligible
-            ? String(localized: "then \(p.displayPrice)/wk")
-            : String(localized: "\(p.displayPrice)/wk")
+    var weeklyCardTitle: String {
+        storeDisplayName(apphud: weeklyProduct, store: weeklyStoreProduct)
     }
 
-    var yearlyPriceText: String? {
-        guard let p = yearlyStoreProduct else { return nil }
-        return String(localized: "\(p.displayPrice)/yr")
+    var yearlyCardPrice: String? {
+        yearlyStoreProduct.map(pricePerPeriod)
+    }
+
+    var weeklyCardPrice: String? {
+        guard let product = weeklyStoreProduct else { return nil }
+        let price = pricePerPeriod(product)
+        guard weeklyShowsTrial else { return price }
+        return String(format: String(localized: "Then %@"), price)
     }
 
     var trialPriceLine: String {
-        if let price = weeklyStoreProduct?.displayPrice {
-            if isTrialEligible {
-                return String(localized: "First 3d free, then \(price)/week")
-            }
-            return String(localized: "\(price)/week")
+        guard let product = weeklyStoreProduct else {
+            return String(localized: "First 3 days free")
         }
-        return isTrialEligible
-            ? String(localized: "3-day free trial, then auto-renews")
-            : String(localized: "Cancel anytime")
+        let price = pricePerPeriod(product)
+        return String(format: String(localized: "First 3 days free, then %@"), price)
+    }
+
+    private var weeklyShowsTrial: Bool {
+        guard isTrialEligible,
+              let offer = weeklyStoreProduct?.subscription?.introductoryOffer else { return false }
+        return offer.paymentMode == .freeTrial
     }
 
     var yearlySavePercent: Int? {
@@ -119,36 +127,113 @@ final class PaywallViewModel {
         isLoadingProducts = true
         loadingError = nil
 
-        Apphud.fetchPlacements { [weak self] placements, error in
-            guard let self else { return }
-            Task { @MainActor in
-                guard let found = placements.first(where: { $0.identifier == self.placement.identifier }),
-                      let paywall = found.paywall else {
-                    self.isLoadingProducts = false
-                    self.loadingError = .productsNotAvailable
-                    return
-                }
-
-                self.currentPaywall = paywall
-                Apphud.paywallShown(paywall)
-
-                self.weeklyProduct = paywall.products.first { $0.productId == PaywallConstants.weeklyProductId }
-                self.yearlyProduct = paywall.products.first { $0.productId == PaywallConstants.yearlyProductId }
-
-                if self.weeklyProduct == nil, self.yearlyProduct != nil {
-                    self.selectedPlan = .yearly
-                }
-
-                await self.refreshStoreKitProducts()
-                await self.updateTrialEligibility()
-                self.isLoadingProducts = false
+        Apphud.fetchPlacements(forceRefresh: true) { [weak self] placements, error in
+            let failureMessage = error?.localizedDescription
+            Task { @MainActor [weak self] in
+                await self?.applyPlacements(placements, errorMessage: failureMessage)
             }
         }
     }
 
+    @MainActor
+    private func applyPlacements(_ placements: [ApphudPlacement], errorMessage: String?) async {
+        let summary = placements.map { item in
+            let paywallID = item.paywall?.identifier ?? "nil"
+            let productIDs = item.paywall?.products.map(\.productId).joined(separator: ",") ?? ""
+            return "\(item.identifier) → \(paywallID) [\(productIDs)]"
+        }.joined(separator: "; ")
+        Self.log.info("Apphud placements: \(summary, privacy: .public)")
+        if let errorMessage {
+            Self.log.error("Apphud placements error: \(errorMessage, privacy: .public)")
+        }
+
+        guard let found = placements.first(where: { $0.identifier == placement.identifier }),
+              let paywall = found.paywall else {
+            isLoadingProducts = false
+            loadingError = .productsNotAvailable
+            return
+        }
+
+        if paywall.identifier != placement.paywallIdentifier {
+            Self.log.error("Placement \(self.placement.identifier, privacy: .public) returned paywall \(paywall.identifier, privacy: .public), expected \(self.placement.paywallIdentifier, privacy: .public)")
+        }
+
+        currentPaywall = paywall
+        Apphud.paywallShown(paywall)
+        weeklyProduct = paywall.products.first { $0.productId == PaywallConstants.weeklyProductId }
+        yearlyProduct = paywall.products.first { $0.productId == PaywallConstants.yearlyProductId }
+
+        await refreshStoreKitProducts()
+        await fillUnmatchedProducts(from: paywall.products)
+        await updateTrialEligibility()
+
+        if weeklyProduct == nil, yearlyProduct != nil {
+            selectedPlan = .yearly
+        }
+
+        let missingWeekly = weeklyProduct == nil
+        let missingYearly = placement == .premiumFeatures && yearlyProduct == nil
+        if missingWeekly || missingYearly {
+            let ids = paywall.products.map(\.productId).joined(separator: ", ")
+            Self.log.error("Placement \(self.placement.identifier, privacy: .public) is missing expected products. Received: \(ids, privacy: .public)")
+            loadingError = .productsNotAvailable
+        }
+        isLoadingProducts = false
+    }
+
+    @MainActor
+    private func fillUnmatchedProducts(from products: [ApphudProduct]) async {
+        guard weeklyProduct == nil || (placement == .premiumFeatures && yearlyProduct == nil) else { return }
+
+        for candidate in products {
+            let alreadyUsed = candidate.productId == weeklyProduct?.productId
+                || candidate.productId == yearlyProduct?.productId
+            if alreadyUsed { continue }
+
+            guard let store = try? await candidate.product(),
+                  let period = store.subscription?.subscriptionPeriod else { continue }
+
+            switch (period.unit, period.value) {
+            case (.week, _), (.day, 7):
+                if weeklyProduct == nil {
+                    weeklyProduct = candidate
+                    weeklyStoreProduct = store
+                }
+            case (.year, _):
+                if yearlyProduct == nil {
+                    yearlyProduct = candidate
+                    yearlyStoreProduct = store
+                }
+            default:
+                break
+            }
+        }
+    }
+
+    @MainActor
     private func refreshStoreKitProducts() async {
-        weeklyStoreProduct = try? await weeklyProduct?.product()
-        yearlyStoreProduct = try? await yearlyProduct?.product()
+        weeklyStoreProduct = await fetchStoreProduct(weeklyProduct)
+        yearlyStoreProduct = await fetchStoreProduct(yearlyProduct)
+    }
+
+    @MainActor
+    private func fetchStoreProduct(_ apphudProduct: ApphudProduct?) async -> Product? {
+        guard let apphudProduct else { return nil }
+        let productId = apphudProduct.productId
+        if let product = try? await apphudProduct.product() {
+            return product
+        }
+        do {
+            let loaded = try await Product.products(for: [productId])
+            if let product = loaded.first(where: { $0.id == productId }) {
+                return product
+            }
+            Self.log.error("StoreKit omitted \(productId, privacy: .public). Apple did not return this id for nikita.ka.AdBlocker-Pro.")
+            return nil
+        } catch {
+            Self.log.error("StoreKit failed for \(productId, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
     }
 
     private func updateTrialEligibility() async {
@@ -158,6 +243,36 @@ final class PaywallViewModel {
             return
         }
         isTrialEligible = await product.subscription?.isEligibleForIntroOffer ?? false
+    }
+
+    private func storeDisplayName(apphud: ApphudProduct?, store: Product?) -> String {
+        if let displayName = store?.displayName.trimmingCharacters(in: .whitespacesAndNewlines), !displayName.isEmpty {
+            return displayName
+        }
+        return apphud?.name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+
+    private func pricePerPeriod(_ product: Product) -> String {
+        let price = product.displayPrice
+        guard let period = product.subscription?.subscriptionPeriod else { return price }
+        let unit = unitWord(period)
+        guard !unit.isEmpty else { return price }
+        return "\(price)/\(unit)"
+    }
+
+    private func unitWord(_ period: Product.SubscriptionPeriod) -> String {
+        switch period.unit {
+        case .day:
+            return period.value == 7 ? String(localized: "week") : String(localized: "day")
+        case .week:
+            return String(localized: "week")
+        case .month:
+            return String(localized: "month")
+        case .year:
+            return String(localized: "year")
+        @unknown default:
+            return ""
+        }
     }
 
     private func showErr(_ msg: String) {
@@ -205,8 +320,8 @@ enum PaywallError {
 }
 
 enum PaywallConstants {
-    static let weeklyProductId = "adblocker.premium.week1"
-    static let yearlyProductId = "adblocker.premium.year1"
+    static let weeklyProductId = "safeguard_premium_week"
+    static let yearlyProductId = "safeguard_premium_year"
     static let termsURL = "https://adblockerpro.app/terms.html"
     static let privacyURL = "https://adblockerpro.app/privacy.html"
     static let supportEmail = "support@adblockerpro.app"

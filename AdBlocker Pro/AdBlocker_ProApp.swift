@@ -6,8 +6,12 @@ struct AdBlocker_ProApp: App {
 
     @State private var appState = AppState.shared
     @State private var subscriptionManager = SubscriptionManager.shared
+    @State private var showLaunchSetup = true
 
     init() {
+        #if DEBUG
+        Apphud.enableDebugLogs()
+        #endif
         Apphud.start(apiKey: SDKConfig.apphudAPIKey)
         AppsFlyerService.shared.configure()
         AppMetricaService.shared.activate()
@@ -16,11 +20,15 @@ struct AdBlocker_ProApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if !appState.hasCompletedOnboarding {
-                    OnboardingView()
-                } else {
-                    MainTabView()
+            ZStack {
+                MainTabView()
+
+                if showLaunchSetup, !subscriptionManager.isPremium {
+                    LaunchSetupView {
+                        finishLaunchSetup()
+                    }
+                    .transition(.opacity)
+                    .zIndex(1)
                 }
             }
             .environment(appState)
@@ -28,23 +36,24 @@ struct AdBlocker_ProApp: App {
             .preferredColorScheme(.light)
             .onAppear {
                 subscriptionManager.checkSubscriptionStatus()
-            }
-            .onChange(of: appState.hasCompletedOnboarding) { _, completed in
-                guard completed else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                    startFirstLaunchPaywallIfNeeded()
+                if subscriptionManager.isPremium {
+                    showLaunchSetup = false
                 }
             }
         }
     }
 
-    private func startFirstLaunchPaywallIfNeeded() {
+    private func finishLaunchSetup() {
+        subscriptionManager.checkSubscriptionStatus()
+        withAnimation(.easeOut(duration: 0.25)) {
+            showLaunchSetup = false
+        }
+
         if !subscriptionManager.isPremium {
-            appState.pendingSafariSetupAfterPaywall = true
-            subscriptionManager.showPaywall(for: .onboarding)
-        } else if !appState.hasShownSafariSetupAfterOnboarding {
-            appState.hasShownSafariSetupAfterOnboarding = true
-            appState.showSafariSetupGuide = true
+            appState.pendingSafariSetupAfterPaywall = !appState.hasShownSafariSetupAfterOnboarding
+            subscriptionManager.showPaywall(for: .launch)
+        } else {
+            Task { await appState.presentSafariSetupIfNeeded() }
         }
     }
 

@@ -46,19 +46,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		11E06A202FB3B20000C33337 /* Exceptions for "AdBlocker Pro" folder in "AdBlocker Pro" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 11E0696F2FB2647A00C33337 /* AdBlocker Pro */;
-		};
 		11E069F22FB27C7C00C33337 /* Exceptions for "ContentBlockerExtension" folder in "ContentBlockerExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 11E069E42FB27C7C00C33337 /* ContentBlockerExtension */;
+		};
+		11E06A202FB3B20000C33337 /* Exceptions for "AdBlocker Pro" folder in "AdBlocker Pro" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 11E0696F2FB2647A00C33337 /* AdBlocker Pro */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -396,16 +396,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "AdBlocker Pro/AdBlocker Pro.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = CZPS8FB75D;
+				DEVELOPMENT_TEAM = 424XBTW2M9;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "AdBlocker Pro/Info.plist";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "AdBlocker Pro uses Face ID to protect your saved passwords";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "It will help us to provide you a more personalized experience, relevant content and promotions.";
@@ -426,6 +428,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "nikita.ka.AdBlocker-Pro";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -447,16 +450,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "AdBlocker Pro/AdBlocker Pro.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = CZPS8FB75D;
+				DEVELOPMENT_TEAM = 424XBTW2M9;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "AdBlocker Pro/Info.plist";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "AdBlocker Pro uses Face ID to protect your saved passwords";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "It will help us to provide you a more personalized experience, relevant content and promotions.";
@@ -477,6 +482,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "nikita.ka.AdBlocker-Pro";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -498,7 +504,7 @@
 				CODE_SIGN_ENTITLEMENTS = ContentBlockerExtension/ContentBlockerExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CZPS8FB75D;
+				DEVELOPMENT_TEAM = 424XBTW2M9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ContentBlockerExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AdBlocker Pro";
@@ -512,6 +518,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "nikita.ka.AdBlocker-Pro.ContentBlockerExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = xros;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -532,7 +539,7 @@
 				CODE_SIGN_ENTITLEMENTS = ContentBlockerExtension/ContentBlockerExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = CZPS8FB75D;
+				DEVELOPMENT_TEAM = 424XBTW2M9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ContentBlockerExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "AdBlocker Pro";
@@ -546,6 +553,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "nikita.ka.AdBlocker-Pro.ContentBlockerExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = xros;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

@@ -2,7 +2,7 @@
 
 ## 1. Safari Content Blocker
 
-Таргет `ContentBlockerExtension`, bundle `nikita.ka.AdBlocker-Pro.ContentBlockerExtension`, App Group `group.nikita.ka.AdBlocker-Pro`. Display name расширения: **AdBlocker Pro**.
+Таргет `ContentBlockerExtension`, bundle `nikita.ka.AdBlocker-Pro.ContentBlockerExtension`, App Group `group.nikita.ka.AdBlocker-Pro.ContentBlockerExt`. Display name расширения: **AdBlocker Pro**.
 
 ## 2. SDK (SPM)
 
@@ -19,32 +19,31 @@
 
 ## 3. Ключи — `SDKConfig.swift` и `PaywallConstants`
 
-Перед релизом замени плейсхолдеры:
+Ключи SDK и AdMob App ID заданы в `SDKConfig.swift` / `AdMobConfig` и `Info.plist`.
 
-- `SDKConfig.appsFlyerDevKey`, `appsFlyerAppleAppID` (без префикса `id`)
-- `SDKConfig.appMetricaAPIKey`
-- `AdMobConfig.applicationID` и `productionRewardedAdUnitID` (сейчас Google test IDs)
-- `GADApplicationIdentifier` в `AdBlocker Pro/Info.plist` — тот же AdMob App ID
+Перед релизом проверь:
+
 - `PaywallConstants.termsURL`, `privacyURL`, `supportEmail` — живые страницы, не заглушки
-- Product IDs: `adblocker.premium.week1`, `adblocker.premium.year1`
-
-Пока ключи-плейсхолдеры, AppsFlyer и AppMetrica **не стартуют** (чтобы не падать).
+- Product IDs: `safeguard_premium_week`, `safeguard_premium_year`
+- Interstitial всегда боевой unit ID, и в Debug, и в Release
 
 ## 4. Apphud Dashboard
 
-1. Products: `adblocker.premium.week1`, `adblocker.premium.year1`
-2. Paywalls с этими products
-3. Placements: `onboarding` (launch paywall), `premium_feature` (premium paywall)
+1. Products: `safeguard_premium_week`, `safeguard_premium_year`
+2. Paywalls: `safeguard_launch`, `safeguard_premium_features`
+3. Placements с теми же идентификаторами: `safeguard_launch` (launch paywall), `safeguard_premium_features` (premium paywall)
 
-## 5. Первый запуск
+## 5. Запуск
 
-Онбординг → ATT → UMP (если нужно) → launch paywall (`PaywallView`) → rewarded (если не premium) → инструкция Safari.
+Каждый холодный старт без подписки: анимация настройки → ATT (если ещё не решён) → UMP → launch paywall (`PaywallView`). С подпиской анимация и пейволл не показываются.
 
-Повторно launch paywall не показывается. Премиум-функции открывают `PremiumPaywallView`.
+Онбординга нет. Премиум-функции (щит, фильтры, вкладка Passwords, плашка PRO) открывают `PremiumPaywallView`.
+
+Инструкция Safari — один раз и только если content blocker выключен.
 
 ## 6. Реклама
 
-Rewarded AdMob после: скана сети, Generate (1 раз за сессию), dismiss любого пейволла. Premium — без рекламы.
+Interstitial AdMob после: скана сети, каждого Generate и dismiss пейволла. Premium — без рекламы.
 
 ## 7. Локализация
 
