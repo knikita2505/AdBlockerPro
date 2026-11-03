@@ -134,7 +134,9 @@ struct SavedPasswordsSection: View {
                     }
                     .padding(.horizontal, AppTheme.spacingM)
                     .padding(.vertical, 12)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
 
                 if index < storage.entries.count - 1 {
                     Divider().padding(.leading, 72)

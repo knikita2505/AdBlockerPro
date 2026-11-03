@@ -202,11 +202,11 @@ struct PasscodeSetupView: View {
             }
 
             VStack(spacing: AppTheme.spacingS) {
-                Text("Enable \(passcodeService.biometricName)?")
+                Text(String(localized: "Enable \(passcodeService.biometricName)?"))
                     .font(AppTheme.titleMedium)
                     .foregroundStyle(AppTheme.primaryText)
 
-                Text("Use \(passcodeService.biometricName) for quick access to your passwords")
+                Text(String(localized: "Use \(passcodeService.biometricName) for quick access to your passwords"))
                     .font(AppTheme.captionFont)
                     .foregroundStyle(AppTheme.secondaryText)
                     .multilineTextAlignment(.center)
@@ -221,7 +221,7 @@ struct PasscodeSetupView: View {
                     passcodeService.setPasscode(confirmCode)
                     HapticManager.notification(.success)
                 } label: {
-                    Text("Enable \(passcodeService.biometricName)")
+                    Text(String(localized: "Enable \(passcodeService.biometricName)"))
                         .font(AppTheme.bodyMedium)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)

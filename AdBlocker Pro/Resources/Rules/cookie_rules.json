@@ -1,58 +1,23 @@
 [
-  {
-    "trigger": { "url-filter": "cookiebot\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "cookielaw\\.org" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "onetrust\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "consent\\.trustarc\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "usercentrics\\.eu" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "didomi\\.io" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "iubenda\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "termly\\.io" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "secureprivacy\\.ai" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "osano\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "cookie.?consent", "resource-type": ["script"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "cookie.?notice", "resource-type": ["script"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "gdpr.?consent", "resource-type": ["script"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": ".*" },
-    "action": { "type": "css-display-none", "selector": "#cookie-notice, #cookie-law-info-bar, #cookie-consent-banner, .cookie-consent, .cookie-banner, .cookie-notice, .cookie-popup, .cookie-modal, .cc-window, .cc-banner, .cc-dialog, .cc_container, .cc_banner, #cookiebanner, #cookieConsent, #CookieConsent, .CookieConsent, #cookies-banner, #gdpr-banner, #gdpr-consent, .gdpr-banner, .gdpr-popup, #onetrust-banner-sdk, #onetrust-consent-sdk, .onetrust-pc-dark-filter, #cookieNotice, .cookie_notice, #cookie_notice, .js-cookie-consent, #consent-banner, .consent-banner, .consent-popup, #didomi-popup, #didomi-host, .iubenda-cs-container, #usercentrics-root, .termly-styles-reset, #osano-cm-window, .cky-consent-container, .cky-consent-bar" }
-  }
+  {"trigger":{"url-filter":"cookiebot\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cookielaw\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"onetrust\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"consent\\.trustarc\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"usercentrics\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"didomi\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"iubenda\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"termly\\.io"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"secureprivacy\\.ai"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"osano\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"evidon\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cookiepro\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"consentmanager\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"privacy-mgmt\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"sourcepoint\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"quantcast\\.mgr\\.consensu\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cookie.?consent","resource-type":["script"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cookie.?notice","resource-type":["script"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"gdpr.?consent","resource-type":["script"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cookie.?banner","resource-type":["script"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":".*"},"action":{"type":"css-display-none","selector":"#cookie-notice, #cookie-law-info-bar, #cookie-consent-banner, .cookie-consent, .cookie-banner, .cookie-notice, .cookie-popup, .cookie-modal, .cc-window, .cc-banner, .cc-dialog, .cc_container, .cc_banner, #cookiebanner, #cookieConsent, #CookieConsent, .CookieConsent, #cookies-banner, #gdpr-banner, #gdpr-consent, .gdpr-banner, .gdpr-popup, #onetrust-banner-sdk, #onetrust-consent-sdk, .onetrust-pc-dark-filter, #cookieNotice, .cookie_notice, #cookie_notice, .js-cookie-consent, #consent-banner, .consent-banner, .consent-popup, #didomi-popup, #didomi-host, .iubenda-cs-container, #usercentrics-root, .termly-styles-reset, #osano-cm-window, .cky-consent-container, .cky-consent-bar, [class*='cookie-banner'], [id*='cookie-banner'], [class*='gdpr-'], [id*='gdpr-'], [class*='consent-banner'], [id*='consent-banner'], .fc-consent-root, #fc-consent-root, .sp-message-container, #sp_message_container_0"}}
 ]

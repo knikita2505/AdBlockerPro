@@ -29,9 +29,9 @@ struct BlockedWebsitesView: View {
                     .disabled(newDomain.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             } header: {
-                Text("Add Website")
+                Text(String(localized: "Add Website"))
             } footer: {
-                Text("These websites will always be blocked regardless of other filter settings")
+                Text(String(localized: "These websites will always be blocked regardless of other filter settings"))
             }
 
             Section {
@@ -42,7 +42,7 @@ struct BlockedWebsitesView: View {
                             Image(systemName: "xmark.circle")
                                 .font(.largeTitle)
                                 .foregroundStyle(AppTheme.secondaryText)
-                            Text("No blocked websites yet")
+                            Text(String(localized: "No blocked websites yet"))
                                 .font(AppTheme.captionFont)
                                 .foregroundStyle(AppTheme.secondaryText)
                         }
@@ -63,15 +63,15 @@ struct BlockedWebsitesView: View {
                     }
                 }
             } header: {
-                Text("Blocked Websites (\(contentBlocker.blockedWebsites.count))")
+                Text(String(localized: "Blocked Websites (\(contentBlocker.blockedWebsites.count))"))
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Blocked Websites")
-        .alert("Invalid Domain", isPresented: $showInvalidDomainAlert) {
-            Button("OK", role: .cancel) {}
+        .navigationTitle(String(localized: "Blocked Websites"))
+        .alert(String(localized: "Invalid Domain"), isPresented: $showInvalidDomainAlert) {
+            Button(String(localized: "OK"), role: .cancel) {}
         } message: {
-            Text("Please enter a valid domain name (e.g. example.com)")
+            Text(String(localized: "Please enter a valid domain name (e.g. example.com)"))
         }
     }
 

@@ -244,6 +244,7 @@ struct PasswordGeneratorSection: View {
         })
 
         HapticManager.impact(.light)
+        Task { await AdPresentationService.shared.showAfterGenerateIfNeeded() }
     }
 
     private func copyPassword() {

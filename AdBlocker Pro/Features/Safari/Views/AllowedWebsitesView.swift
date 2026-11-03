@@ -29,9 +29,9 @@ struct AllowedWebsitesView: View {
                     .disabled(newDomain.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             } header: {
-                Text("Add Website")
+                Text(String(localized: "Add Website"))
             } footer: {
-                Text("Websites in this list will not be affected by content blocking rules")
+                Text(String(localized: "Websites in this list will not be affected by content blocking rules"))
             }
 
             Section {
@@ -42,7 +42,7 @@ struct AllowedWebsitesView: View {
                             Image(systemName: "checkmark.circle")
                                 .font(.largeTitle)
                                 .foregroundStyle(AppTheme.secondaryText)
-                            Text("No allowed websites yet")
+                            Text(String(localized: "No allowed websites yet"))
                                 .font(AppTheme.captionFont)
                                 .foregroundStyle(AppTheme.secondaryText)
                         }
@@ -63,15 +63,15 @@ struct AllowedWebsitesView: View {
                     }
                 }
             } header: {
-                Text("Allowed Websites (\(contentBlocker.allowedWebsites.count))")
+                Text(String(localized: "Allowed Websites (\(contentBlocker.allowedWebsites.count))"))
             }
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("Allowed Websites")
-        .alert("Invalid Domain", isPresented: $showInvalidDomainAlert) {
-            Button("OK", role: .cancel) {}
+        .navigationTitle(String(localized: "Allowed Websites"))
+        .alert(String(localized: "Invalid Domain"), isPresented: $showInvalidDomainAlert) {
+            Button(String(localized: "OK"), role: .cancel) {}
         } message: {
-            Text("Please enter a valid domain name (e.g. example.com)")
+            Text(String(localized: "Please enter a valid domain name (e.g. example.com)"))
         }
     }
 

@@ -8,6 +8,9 @@ struct SafariMainView: View {
 
     @State private var showSettings = false
     @State private var showGuides = false
+    @State private var showExtensionSetup = false
+
+    @Environment(\.scenePhase) private var scenePhase
 
     private var activeFilterCount: Int {
         FilterCategory.allCases.filter { viewModel.isFilterEnabled($0) }.count
@@ -29,7 +32,7 @@ struct SafariMainView: View {
 
                     websiteListsSection
 
-                    Spacer(minLength: 100)
+                    Spacer(minLength: 40)
                 }
                 .padding(.horizontal, AppTheme.spacingM)
                 .padding(.top, AppTheme.spacingS)
@@ -44,8 +47,23 @@ struct SafariMainView: View {
                 PrivacyGuidesView()
                     .presentationBackground(AppTheme.background)
             }
+            .fullScreenCover(isPresented: $showExtensionSetup) {
+                SafariSetupGuideView()
+            }
             .onAppear {
+                subscriptionManager.checkSubscriptionStatus()
+                contentBlocker.enforceSubscriptionAccess()
                 Task { await contentBlocker.checkExtensionStatus() }
+            }
+            .onChange(of: subscriptionManager.isPremium) { _, isPremium in
+                if !isPremium {
+                    contentBlocker.enforceSubscriptionAccess()
+                }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    Task { await contentBlocker.checkExtensionStatus() }
+                }
             }
         }
     }
@@ -53,8 +71,8 @@ struct SafariMainView: View {
     // MARK: - Header
 
     private var headerSection: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: AppTheme.spacingXS) {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(String(localized: "Protection"))
                     .font(AppTheme.titleFont)
                     .foregroundStyle(AppTheme.primaryText)
@@ -67,38 +85,31 @@ struct SafariMainView: View {
             Spacer()
 
             HStack(spacing: AppTheme.spacingS) {
-                Button {
-                    HapticManager.impact(.light)
+                ProBadgeButton()
+                headerButton(icon: "book") {
                     showGuides = true
-                } label: {
-                    Image(systemName: "book.fill")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .frame(width: 42, height: 42)
-                        .background(AppTheme.surface)
-                        .clipShape(Circle())
-                        .shadow(color: AppTheme.shadowSoft, radius: 8, x: 0, y: 2)
-                        .shadow(color: AppTheme.shadowMedium, radius: 1, x: 0, y: 1)
                 }
-                .pressable()
-
-                Button {
-                    HapticManager.impact(.light)
+                headerButton(icon: "gearshape") {
                     showSettings = true
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .frame(width: 42, height: 42)
-                        .background(AppTheme.surface)
-                        .clipShape(Circle())
-                        .shadow(color: AppTheme.shadowSoft, radius: 8, x: 0, y: 2)
-                        .shadow(color: AppTheme.shadowMedium, radius: 1, x: 0, y: 1)
                 }
-                .pressable()
             }
         }
-        .padding(.top, AppTheme.spacingS)
+    }
+
+    private func headerButton(icon: String, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.impact(.light)
+            action()
+        } label: {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(AppTheme.secondaryText)
+                .frame(width: 40, height: 40)
+                .background(AppTheme.surface)
+                .clipShape(Circle())
+                .shadow(color: AppTheme.shadowSoft, radius: 8, y: 2)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Extension Banner
@@ -106,44 +117,35 @@ struct SafariMainView: View {
     private var extensionBanner: some View {
         Button {
             HapticManager.impact(.light)
-            #if os(iOS)
-            if let url = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(url)
-            }
-            #endif
+            showExtensionSetup = true
         } label: {
             HStack(spacing: AppTheme.spacingM) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
-                        .fill(AppTheme.warning.opacity(0.12))
-                        .frame(width: 44, height: 44)
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundStyle(AppTheme.warning)
-                }
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(AppTheme.destructive)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(String(localized: "Extension Disabled"))
-                        .font(AppTheme.bodyMedium)
-                        .foregroundStyle(AppTheme.primaryText)
-                    Text(String(localized: "Enable in Settings → Safari → Extensions"))
-                        .font(AppTheme.captionFont)
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .lineLimit(2)
-                }
+                Text(String(localized: "Enable AdBlocker Pro Extension"))
+                    .font(AppTheme.bodyMedium)
+                    .foregroundStyle(AppTheme.primaryText)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                Spacer()
+                Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(AppTheme.tertiaryText)
+                    .foregroundStyle(AppTheme.destructive.opacity(0.7))
             }
-            .padding(AppTheme.spacingM)
-            .background(AppTheme.warning.opacity(0.06))
+            .padding(.horizontal, AppTheme.spacingM)
+            .padding(.vertical, 14)
+            .background(AppTheme.destructive.opacity(0.08))
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous)
-                    .stroke(AppTheme.warning.opacity(0.2), lineWidth: 1)
+                    .stroke(AppTheme.destructive, lineWidth: 1.5)
             )
         }
         .pressable()
@@ -155,29 +157,32 @@ struct SafariMainView: View {
         VStack(spacing: AppTheme.spacingM) {
             Button {
                 HapticManager.impact(.medium)
-                contentBlocker.toggleProtection()
+                if contentBlocker.isProtectionActive {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
+                        contentBlocker.toggleProtection()
+                    }
+                } else if !subscriptionManager.isPremium {
+                    subscriptionManager.showPaywall(for: .premiumFeatures)
+                } else if !contentBlocker.isExtensionEnabled {
+                    showExtensionSetup = true
+                } else {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
+                        contentBlocker.toggleProtection()
+                    }
+                }
             } label: {
                 ZStack {
                     Circle()
-                        .fill(
+                        .stroke(
                             contentBlocker.isProtectionActive
-                            ? LinearGradient(
-                                colors: [AppTheme.gradientStart.opacity(0.15), AppTheme.gradientEnd.opacity(0.08)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            : LinearGradient(
-                                colors: [AppTheme.surfaceSecondary, AppTheme.surfaceSecondary],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                            ? AppTheme.accent.opacity(0.16)
+                            : Color.black.opacity(0.04),
+                            lineWidth: 10
                         )
-                        .frame(width: 120, height: 120)
+                        .frame(width: 156, height: 156)
 
-                    Image(systemName: contentBlocker.isProtectionActive
-                          ? "checkmark.shield.fill" : "shield.slash")
-                        .font(.system(size: 52, weight: .medium, design: .rounded))
-                        .foregroundStyle(
+                    Circle()
+                        .fill(
                             contentBlocker.isProtectionActive
                             ? LinearGradient(
                                 colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
@@ -185,52 +190,69 @@ struct SafariMainView: View {
                                 endPoint: .bottomTrailing
                             )
                             : LinearGradient(
-                                colors: [AppTheme.tertiaryText, AppTheme.tertiaryText],
-                                startPoint: .top,
-                                endPoint: .bottom
+                                colors: [Color(hex: "E8ECF0"), Color(hex: "D5DBE2")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
                             )
                         )
+                        .frame(width: 120, height: 120)
+                        .shadow(
+                            color: contentBlocker.isProtectionActive
+                            ? AppTheme.accent.opacity(0.32)
+                            : Color.black.opacity(0.08),
+                            radius: contentBlocker.isProtectionActive ? 22 : 10,
+                            y: 8
+                        )
+
+                    Image(systemName: contentBlocker.isProtectionActive
+                          ? "checkmark.shield.fill"
+                          : "shield")
+                        .font(.system(size: 46, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white)
                         .contentTransition(.symbolEffect(.replace))
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressedStyle())
+            .accessibilityLabel(String(localized: "Ad Blocking"))
+            .accessibilityValue(contentBlocker.isProtectionActive
+                                ? String(localized: "ON")
+                                : String(localized: "OFF"))
 
-            VStack(spacing: AppTheme.spacingXS) {
-                HStack(spacing: 6) {
-                    Text(String(localized: "Ad Blocking is"))
-                        .font(AppTheme.titleMedium)
-                        .foregroundStyle(AppTheme.primaryText)
-                    Text(contentBlocker.isProtectionActive
-                         ? String(localized: "ON")
-                         : String(localized: "OFF"))
-                        .font(AppTheme.titleMedium)
-                        .foregroundStyle(contentBlocker.isProtectionActive
-                                         ? AppTheme.accent : AppTheme.destructive)
-                }
+            VStack(spacing: 4) {
+                Text(contentBlocker.isProtectionActive
+                     ? String(localized: "Protection On")
+                     : String(localized: "Protection Off"))
+                    .font(AppTheme.titleSmall)
+                    .foregroundStyle(AppTheme.primaryText)
 
-                Text("\(activeFilterCount) " + String(localized: "filters active"))
+                Text(heroSubtitle)
                     .font(AppTheme.captionFont)
-                    .foregroundStyle(AppTheme.tertiaryText)
-            }
-
-            if contentBlocker.isReloading {
-                ProgressView()
-                    .tint(AppTheme.accent)
+                    .foregroundStyle(contentBlocker.isProtectionActive
+                                     ? AppTheme.accent
+                                     : AppTheme.tertiaryText)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, AppTheme.spacingL)
-        .cardStyle()
+        .padding(.vertical, AppTheme.spacingS)
+    }
+
+    private var heroSubtitle: String {
+        if contentBlocker.isProtectionActive {
+            return "\(activeFilterCount) " + String(localized: "filters active")
+        }
+        return String(localized: "Tap the shield to start blocking")
     }
 
     // MARK: - Filters Section
 
     private var filtersSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.spacingM) {
+        VStack(alignment: .leading, spacing: AppTheme.spacingS) {
             Text(String(localized: "Filters"))
-                .font(AppTheme.titleSmall)
-                .foregroundStyle(AppTheme.primaryText)
-                .padding(.leading, AppTheme.spacingXS)
+                .font(AppTheme.captionMedium)
+                .foregroundStyle(AppTheme.secondaryText)
+                .textCase(.uppercase)
+                .tracking(0.6)
+                .padding(.leading, AppTheme.spacingS)
 
             VStack(spacing: 0) {
                 ForEach(Array(FilterCategory.allCases.enumerated()), id: \.element.id) { index, category in
@@ -239,13 +261,20 @@ struct SafariMainView: View {
                         isOn: viewModel.isFilterEnabled(category),
                         isLocked: !subscriptionManager.isPremium
                     ) { newValue in
-                        HapticManager.impact(.light)
+                        if newValue && !subscriptionManager.isPremium {
+                            subscriptionManager.showPaywall(for: .premiumFeatures)
+                            return
+                        }
+                        if newValue && !contentBlocker.isExtensionEnabled {
+                            showExtensionSetup = true
+                            return
+                        }
                         viewModel.toggleFilter(category, isOn: newValue)
                     }
 
                     if index < FilterCategory.allCases.count - 1 {
                         Divider()
-                            .padding(.leading, 60)
+                            .padding(.leading, 62)
                     }
                 }
             }
@@ -256,18 +285,20 @@ struct SafariMainView: View {
     // MARK: - Website Lists
 
     private var websiteListsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.spacingM) {
+        VStack(alignment: .leading, spacing: AppTheme.spacingS) {
             Text(String(localized: "Website Lists"))
-                .font(AppTheme.titleSmall)
-                .foregroundStyle(AppTheme.primaryText)
-                .padding(.leading, AppTheme.spacingXS)
+                .font(AppTheme.captionMedium)
+                .foregroundStyle(AppTheme.secondaryText)
+                .textCase(.uppercase)
+                .tracking(0.6)
+                .padding(.leading, AppTheme.spacingS)
 
             VStack(spacing: 0) {
                 NavigationLink {
                     AllowedWebsitesView()
                 } label: {
                     WebsiteListRow(
-                        icon: "checkmark.square.fill",
+                        icon: "checkmark",
                         iconColor: AppTheme.accent,
                         title: String(localized: "Approved List"),
                         subtitle: String(localized: "Not block this websites"),
@@ -276,13 +307,13 @@ struct SafariMainView: View {
                 }
 
                 Divider()
-                    .padding(.leading, 60)
+                    .padding(.leading, 62)
 
                 NavigationLink {
                     BlockedWebsitesView()
                 } label: {
                     WebsiteListRow(
-                        icon: "xmark.square.fill",
+                        icon: "xmark",
                         iconColor: AppTheme.destructive,
                         title: String(localized: "Block List"),
                         subtitle: String(localized: "Block access to this websites"),
@@ -303,21 +334,27 @@ private struct FilterToggleCard: View {
     let isLocked: Bool
     let onToggle: (Bool) -> Void
 
+    @State private var showTooltip = false
+
     var body: some View {
         HStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
-                    .fill(category.iconColor.opacity(0.12))
-                    .frame(width: 44, height: 44)
+            Button {
+                showTooltip = true
+            } label: {
                 Image(systemName: category.icon)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(category.iconColor)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .frame(width: 30, height: 30)
+                    .background(category.iconColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
             }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(category.title)
                     .font(AppTheme.bodyMedium)
                     .foregroundStyle(AppTheme.primaryText)
+
                 Text(category.subtitle)
                     .font(AppTheme.captionFont)
                     .foregroundStyle(AppTheme.secondaryText)
@@ -326,7 +363,18 @@ private struct FilterToggleCard: View {
 
             Spacer()
 
-            Toggle("", isOn: Binding(
+            Button {
+                showTooltip = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.tertiaryText)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            Toggle(category.title, isOn: Binding(
                 get: { isOn },
                 set: { onToggle($0) }
             ))
@@ -334,7 +382,15 @@ private struct FilterToggleCard: View {
             .labelsHidden()
         }
         .padding(.horizontal, AppTheme.spacingM)
-        .padding(.vertical, AppTheme.spacingM - 2)
+        .padding(.vertical, 12)
+        .sheet(isPresented: $showTooltip) {
+            InfoTipSheet(
+                icon: category.icon,
+                iconColor: category.iconColor,
+                title: category.title,
+                message: category.tooltip
+            )
+        }
     }
 }
 
@@ -349,14 +405,12 @@ private struct WebsiteListRow: View {
 
     var body: some View {
         HStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
-                    .fill(iconColor.opacity(0.12))
-                    .frame(width: 44, height: 44)
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(iconColor)
-            }
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(width: 30, height: 30)
+                .background(iconColor)
+                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -384,7 +438,7 @@ private struct WebsiteListRow: View {
                 .foregroundStyle(AppTheme.tertiaryText)
         }
         .padding(.horizontal, AppTheme.spacingM)
-        .padding(.vertical, AppTheme.spacingM - 2)
+        .padding(.vertical, 12)
     }
 }
 

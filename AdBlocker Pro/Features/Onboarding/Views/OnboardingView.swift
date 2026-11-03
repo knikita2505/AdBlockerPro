@@ -2,8 +2,10 @@ import SwiftUI
 
 struct OnboardingView: View {
 
-    var appState = AppState.shared
+    var onFinished: () -> Void
+
     @State private var currentPage = 0
+    @State private var isFinishing = false
 
     private let pages: [OnboardingPage] = [
         OnboardingPage(
@@ -32,53 +34,46 @@ struct OnboardingView: View {
         )
     ]
 
+    private var isLastPage: Bool { currentPage == pages.count - 1 }
+    private var isPenultimatePage: Bool { currentPage == pages.count - 2 }
+
     var body: some View {
         ZStack {
-            backgroundGradient
+            AppTheme.background
 
             VStack(spacing: 0) {
                 HStack {
                     Spacer()
-                    if currentPage < pages.count - 1 {
+                    if !isLastPage {
                         Button(String(localized: "Skip")) {
                             completeOnboarding()
                         }
+                        .disabled(isFinishing)
                         .font(AppTheme.bodyMedium)
                         .foregroundColor(AppTheme.tertiaryText)
                         .padding()
                     }
                 }
 
-                TabView(selection: $currentPage) {
-                    ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                        pageView(page)
-                            .tag(index)
-                    }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                pageView(pages[currentPage])
 
                 bottomSection
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            LinearGradient(
+                colors: [
+                    AppTheme.background,
+                    pages[currentPage].color.opacity(0.08),
+                    AppTheme.background
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        }
     }
-
-    // MARK: - Background
-
-    private var backgroundGradient: some View {
-        LinearGradient(
-            colors: [
-                AppTheme.background,
-                pages[currentPage].color.opacity(0.05),
-                AppTheme.background
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .ignoresSafeArea()
-        .animation(.easeInOut(duration: 0.5), value: currentPage)
-    }
-
-    // MARK: - Page
 
     private func pageView(_ page: OnboardingPage) -> some View {
         VStack(spacing: AppTheme.spacingXL) {
@@ -131,8 +126,6 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Bottom
-
     private var bottomSection: some View {
         VStack(spacing: AppTheme.spacingL) {
             HStack(spacing: AppTheme.spacingS) {
@@ -147,22 +140,19 @@ struct OnboardingView: View {
             }
 
             Button {
-                HapticManager.impact(.medium)
-                if currentPage < pages.count - 1 {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                        currentPage += 1
-                    }
-                } else {
-                    completeOnboarding()
-                }
+                Task { await advance() }
             } label: {
                 HStack(spacing: AppTheme.spacingS) {
-                    Text(currentPage < pages.count - 1
-                         ? String(localized: "Continue")
-                         : String(localized: "Get Started"))
-                        .font(AppTheme.bodyMedium)
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 14, weight: .semibold))
+                    if isFinishing {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text(isLastPage
+                             ? String(localized: "Get Started")
+                             : String(localized: "Continue"))
+                            .font(AppTheme.bodyMedium)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -177,18 +167,44 @@ struct OnboardingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
                 .shadow(color: AppTheme.accent.opacity(0.3), radius: 15, y: 8)
             }
+            .disabled(isFinishing)
             .padding(.horizontal, AppTheme.spacingL)
         }
         .padding(.bottom, AppTheme.spacingXL)
     }
 
-    private func completeOnboarding() {
+    private func advance() async {
+        guard !isFinishing else { return }
         HapticManager.impact(.medium)
-        appState.hasCompletedOnboarding = true
+
+        if isPenultimatePage {
+            isFinishing = true
+            _ = await AppsFlyerService.shared.requestATTPermission()
+            isFinishing = false
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                currentPage += 1
+            }
+            return
+        }
+
+        if !isLastPage {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                currentPage += 1
+            }
+            return
+        }
+
+        completeOnboarding()
+    }
+
+    private func completeOnboarding() {
+        guard !isFinishing else { return }
+        isFinishing = true
+        HapticManager.impact(.medium)
+        AppState.shared.hasCompletedOnboarding = true
+        onFinished()
     }
 }
-
-// MARK: - Model
 
 private struct OnboardingPage {
     let icon: String
@@ -198,5 +214,5 @@ private struct OnboardingPage {
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView {}
 }

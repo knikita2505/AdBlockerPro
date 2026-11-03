@@ -6,76 +6,46 @@ struct PrivacyGuidesView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppTheme.background.ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: AppTheme.spacingS) {
+                    Text(String(localized: "Step-by-step guides to improve your device security"))
+                        .font(AppTheme.bodyFont)
+                        .foregroundStyle(AppTheme.secondaryText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, AppTheme.spacingS)
 
-                ScrollView {
-                    VStack(spacing: AppTheme.spacingM) {
-                        headerCard
-
-                        ForEach(PrivacyGuide.allGuides) { guide in
+                    VStack(spacing: 0) {
+                        ForEach(Array(PrivacyGuide.allGuides.enumerated()), id: \.element.id) { index, guide in
                             NavigationLink {
                                 PrivacyGuideDetailView(guide: guide)
                             } label: {
                                 GuideListCard(guide: guide)
                             }
-                            .pressable()
-                        }
+                            .buttonStyle(.plain)
 
-                        Spacer(minLength: AppTheme.spacingL)
+                            if index < PrivacyGuide.allGuides.count - 1 {
+                                Divider()
+                                    .padding(.leading, 62)
+                            }
+                        }
                     }
-                    .padding(.horizontal, AppTheme.spacingM)
-                    .padding(.top, AppTheme.spacingM)
+                    .cardStyle(padding: 0)
                 }
+                .padding(.horizontal, AppTheme.spacingM)
+                .padding(.top, AppTheme.spacingM)
+                .padding(.bottom, AppTheme.spacingL)
             }
+            .background(AppTheme.background.ignoresSafeArea())
             .navigationTitle(String(localized: "Privacy Guides"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "Done")) { dismiss() }
                         .font(AppTheme.bodyMedium)
-                        .foregroundColor(AppTheme.accent)
+                        .foregroundStyle(AppTheme.accent)
                 }
             }
         }
-    }
-
-    private var headerCard: some View {
-        VStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppTheme.accentSoft, AppTheme.accent.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 80, height: 80)
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 34, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-
-            Text(String(localized: "Protect Your Privacy"))
-                .font(AppTheme.titleMedium)
-                .foregroundStyle(AppTheme.primaryText)
-
-            Text(String(localized: "Step-by-step guides to improve your device security"))
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppTheme.spacingL)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, AppTheme.spacingL)
-        .cardStyle()
     }
 }
 
@@ -83,45 +53,71 @@ struct PrivacyGuidesView: View {
 
 private struct GuideListCard: View {
     let guide: PrivacyGuide
+    var progressStore = GuideProgressStore.shared
+
+    private var completedCount: Int {
+        min(progressStore.completedCount(for: guide.id), guide.steps.count)
+    }
+
+    private var isComplete: Bool {
+        progressStore.isComplete(guideId: guide.id, total: guide.steps.count)
+    }
 
     var body: some View {
-        HStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
-                    .fill(guide.color.opacity(0.15))
-                    .frame(width: 48, height: 48)
-                Image(systemName: guide.icon)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(guide.color)
-            }
+        HStack(alignment: .top, spacing: AppTheme.spacingM) {
+            Image(systemName: isComplete ? "checkmark" : guide.icon)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(width: 30, height: 30)
+                .background(isComplete ? AppTheme.accent : guide.color)
+                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                .padding(.top, 1)
 
-            VStack(alignment: .leading, spacing: AppTheme.spacingXS) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text(guide.title)
                     .font(AppTheme.bodyMedium)
                     .foregroundStyle(AppTheme.primaryText)
-                    .lineLimit(1)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(guide.subtitle)
                     .font(AppTheme.captionFont)
                     .foregroundStyle(AppTheme.secondaryText)
-                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: 4) {
-                    Image(systemName: "list.number")
-                        .font(.system(size: 10))
-                    Text("\(guide.steps.count) \(String(localized: "steps"))")
-                        .font(AppTheme.captionSmall)
+                HStack(spacing: AppTheme.spacingS) {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(guide.color.opacity(0.12))
+                            Capsule()
+                                .fill(isComplete ? AppTheme.accent : guide.color)
+                                .frame(width: geo.size.width * progress)
+                        }
+                    }
+                    .frame(height: 4)
+
+                    Text("\(completedCount)/\(guide.steps.count)")
+                        .font(AppTheme.captionMedium)
+                        .foregroundStyle(isComplete ? AppTheme.accent : AppTheme.tertiaryText)
+                        .monospacedDigit()
                 }
-                .foregroundStyle(guide.color)
             }
-
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(AppTheme.tertiaryText)
+                .padding(.top, 8)
         }
-        .cardStyle()
+        .padding(.horizontal, AppTheme.spacingM)
+        .padding(.vertical, 14)
+    }
+
+    private var progress: CGFloat {
+        guard !guide.steps.isEmpty else { return 0 }
+        return CGFloat(completedCount) / CGFloat(guide.steps.count)
     }
 }
 
@@ -130,144 +126,204 @@ private struct GuideListCard: View {
 struct PrivacyGuideDetailView: View {
 
     let guide: PrivacyGuide
-    @State private var completedSteps: Set<Int> = []
+    var progressStore = GuideProgressStore.shared
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var currentStep = 0
+
+    private var isLastStep: Bool {
+        currentStep >= guide.steps.count - 1
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: AppTheme.spacingL) {
-                detailHeader
-                stepsCard
+        VStack(spacing: 0) {
+            header
+
+            TabView(selection: $currentStep) {
+                ForEach(guide.steps.indices, id: \.self) { index in
+                    GuideStepCard(
+                        guide: guide,
+                        stepIndex: index,
+                        stepText: guide.steps[index],
+                        isCompleted: progressStore.completedSteps(for: guide.id).contains(index)
+                    )
+                    .padding(.horizontal, AppTheme.spacingM)
+                    .tag(index)
+                }
             }
-            .padding(.horizontal, AppTheme.spacingM)
-            .padding(.vertical, AppTheme.spacingM)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 340)
+
+            pageDots
+                .padding(.top, AppTheme.spacingS)
+
+            Spacer(minLength: AppTheme.spacingM)
+
+            if currentStep > 0 {
+                Button {
+                    HapticManager.impact(.light)
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        currentStep = 0
+                    }
+                } label: {
+                    Label(String(localized: "Start Over"), systemImage: "arrow.counterclockwise")
+                        .font(AppTheme.captionMedium)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+                .padding(.bottom, AppTheme.spacingS)
+            }
+
+            controls
+                .padding(.horizontal, AppTheme.spacingM)
+                .padding(.bottom, AppTheme.spacingL)
         }
-        .background(AppTheme.background)
+        .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle(guide.shortTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            let saved = progressStore.currentPage(for: guide.id)
+            currentStep = min(max(saved, 0), guide.steps.count - 1)
+        }
+        .onDisappear {
+            progressStore.setPage(currentStep, guideId: guide.id)
+            progressStore.markStep(currentStep, guideId: guide.id)
+        }
+        .onChange(of: currentStep) { oldValue, newValue in
+            progressStore.setPage(newValue, guideId: guide.id)
+            if newValue > oldValue {
+                progressStore.markCompleted(upTo: oldValue, guideId: guide.id)
+            }
+        }
     }
 
-    private var detailHeader: some View {
-        VStack(spacing: AppTheme.spacingM) {
+    private var header: some View {
+        VStack(spacing: 8) {
+            Text(guide.title)
+                .font(AppTheme.titleSmall)
+                .foregroundStyle(AppTheme.primaryText)
+                .multilineTextAlignment(.center)
+
+            Text(String(localized: "Step \(currentStep + 1) of \(guide.steps.count)"))
+                .font(AppTheme.captionMedium)
+                .foregroundStyle(guide.color)
+        }
+        .padding(.horizontal, AppTheme.spacingL)
+        .padding(.top, AppTheme.spacingM)
+        .padding(.bottom, AppTheme.spacingS)
+    }
+
+    private var pageDots: some View {
+        HStack(spacing: 6) {
+            ForEach(guide.steps.indices, id: \.self) { index in
+                Capsule()
+                    .fill(index == currentStep ? guide.color : guide.color.opacity(0.2))
+                    .frame(width: index == currentStep ? 16 : 6, height: 6)
+                    .animation(.easeInOut(duration: 0.2), value: currentStep)
+            }
+        }
+    }
+
+    private var controls: some View {
+        HStack(spacing: AppTheme.spacingS) {
+            if currentStep > 0 {
+                Button {
+                    HapticManager.impact(.light)
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        currentStep -= 1
+                    }
+                } label: {
+                    Text(String(localized: "Back"))
+                        .font(AppTheme.bodyMedium)
+                        .foregroundStyle(AppTheme.primaryText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(AppTheme.surface)
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
+                        .shadow(color: AppTheme.shadowSoft, radius: 8, y: 2)
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button {
+                HapticManager.impact(.medium)
+                progressStore.markStep(currentStep, guideId: guide.id)
+                if isLastStep {
+                    progressStore.markCompleted(upTo: currentStep, guideId: guide.id)
+                    dismiss()
+                } else {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        currentStep += 1
+                    }
+                }
+            } label: {
+                Text(isLastStep ? String(localized: "Done") : String(localized: "Next"))
+                    .font(AppTheme.bodyMedium)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(guide.color)
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
+// MARK: - Step Card
+
+private struct GuideStepCard: View {
+    let guide: PrivacyGuide
+    let stepIndex: Int
+    let stepText: String
+    let isCompleted: Bool
+
+    private var showsSettingsAction: Bool {
+        guide.id == "content-blocker" && stepIndex == 3
+    }
+
+    var body: some View {
+        VStack(spacing: AppTheme.spacingL) {
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [guide.color.opacity(0.2), guide.color.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 100, height: 100)
+                    .fill(guide.color.opacity(0.12))
+                    .frame(width: 72, height: 72)
 
-                Image(systemName: guide.icon)
-                    .font(.system(size: 40, weight: .medium))
-                    .foregroundStyle(guide.color)
-            }
-            .shadow(color: guide.color.opacity(0.15), radius: 20)
-
-            Text(guide.title)
-                .font(AppTheme.titleMedium)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(AppTheme.primaryText)
-
-            Text(guide.subtitle)
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-
-            progressBar
-        }
-        .frame(maxWidth: .infinity)
-        .cardStyle(padding: AppTheme.spacingL)
-    }
-
-    private var progressBar: some View {
-        VStack(spacing: 6) {
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(guide.color.opacity(0.12))
-                        .frame(height: 8)
-
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(guide.color)
-                        .frame(width: geo.size.width * progress, height: 8)
-                        .animation(.easeInOut(duration: 0.3), value: progress)
-                }
-            }
-            .frame(height: 8)
-
-            Text("\(completedSteps.count)/\(guide.steps.count) \(String(localized: "completed"))")
-                .font(AppTheme.captionSmall)
-                .foregroundStyle(AppTheme.secondaryText)
-        }
-    }
-
-    private var progress: Double {
-        guard !guide.steps.isEmpty else { return 0 }
-        return Double(completedSteps.count) / Double(guide.steps.count)
-    }
-
-    private var stepsCard: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(guide.steps.enumerated()), id: \.offset) { index, step in
-                stepRow(index: index, text: step, isLast: index == guide.steps.count - 1)
-            }
-        }
-        .background(AppTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusL, style: .continuous))
-        .shadow(color: AppTheme.shadowSoft, radius: 8, x: 0, y: 2)
-        .shadow(color: AppTheme.shadowMedium, radius: 1, x: 0, y: 1)
-    }
-
-    private func stepRow(index: Int, text: String, isLast: Bool) -> some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                if completedSteps.contains(index) {
-                    completedSteps.remove(index)
+                if isCompleted {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(guide.color)
                 } else {
-                    completedSteps.insert(index)
-                    HapticManager.impact(.light)
+                    Text("\(stepIndex + 1)")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(guide.color)
                 }
             }
-        } label: {
-            VStack(spacing: 0) {
-                HStack(alignment: .top, spacing: AppTheme.spacingM) {
-                    ZStack {
-                        Circle()
-                            .fill(completedSteps.contains(index)
-                                  ? guide.color
-                                  : guide.color.opacity(0.12))
-                            .frame(width: 32, height: 32)
 
-                        if completedSteps.contains(index) {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(.white)
-                        } else {
-                            Text("\(index + 1)")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
-                                .foregroundStyle(guide.color)
-                        }
+            Text(stepText)
+                .font(AppTheme.bodyLarge)
+                .foregroundStyle(AppTheme.primaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if showsSettingsAction {
+                Button {
+                    #if os(iOS)
+                    if let url = URL(string: "App-prefs:SAFARI&path=WEB_EXTENSIONS") {
+                        UIApplication.shared.open(url)
                     }
-
-                    Text(text)
-                        .font(AppTheme.bodyFont)
-                        .foregroundStyle(completedSteps.contains(index)
-                                         ? AppTheme.secondaryText
-                                         : AppTheme.primaryText)
-                        .strikethrough(completedSteps.contains(index))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 5)
-                }
-                .padding(.horizontal, AppTheme.spacingM)
-                .padding(.vertical, 14)
-
-                if !isLast {
-                    Divider().padding(.leading, 60)
+                    #endif
+                } label: {
+                    Text(String(localized: "Open Settings"))
+                        .font(AppTheme.captionMedium)
+                        .foregroundStyle(guide.color)
                 }
             }
         }
+        .padding(AppTheme.spacingL)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .background(AppTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusXL, style: .continuous))
+        .shadow(color: AppTheme.shadowSoft, radius: 14, y: 6)
     }
 }
 
@@ -294,10 +350,10 @@ struct PrivacyGuide: Identifiable, Hashable {
             shortTitle: String(localized: "Content Blocker"),
             subtitle: String(localized: "Block ads and trackers in Safari"),
             steps: [
-                String(localized: "Open the Settings app on your device"),
-                String(localized: "Scroll down and tap Safari"),
+                String(localized: "Open Settings on your device"),
+                String(localized: "Go to Apps, then tap Safari"),
                 String(localized: "Tap Extensions"),
-                String(localized: "Find AdBlocker Pro and toggle it on"),
+                String(localized: "Find AdBlocker Pro and turn it on"),
                 String(localized: "Return to Safari — ads will now be blocked")
             ]
         ),

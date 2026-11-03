@@ -10,7 +10,7 @@ final class ContentBlockerManager {
 
     static let shared = ContentBlockerManager()
 
-    static let appGroupIdentifier = "group.nikita.ka.AdBlocker-Pro"
+    static let appGroupIdentifier = "group.nikita.ka.AdBlocker-Pro.ContentBlockerExt"
     static let extensionBundleIdentifier = "nikita.ka.AdBlocker-Pro.ContentBlockerExtension"
     static let rulesFileName = "blockerList.json"
 
@@ -36,6 +36,8 @@ final class ContentBlockerManager {
 
     private init() {
         loadState()
+        let rules = buildCombinedRules()
+        writeRulesToAppGroup(rules)
         Task { await checkExtensionStatus() }
     }
 
@@ -49,36 +51,65 @@ final class ContentBlockerManager {
         if isProtectionActive {
             UserDefaults.standard.set(enabledFilters.map(\.rawValue), forKey: lastFiltersKey)
             enabledFilters.removeAll()
+            Task { await rebuildAndReload() }
+            return
+        }
+
+        guard SubscriptionManager.shared.isPremium else { return }
+        guard isExtensionEnabled else { return }
+
+        if let last = UserDefaults.standard.stringArray(forKey: lastFiltersKey),
+           !last.isEmpty {
+            enabledFilters = Set(last.compactMap { FilterCategory(rawValue: $0) })
         } else {
-            if let last = UserDefaults.standard.stringArray(forKey: lastFiltersKey),
-               !last.isEmpty {
-                enabledFilters = Set(last.compactMap { FilterCategory(rawValue: $0) })
-            } else {
-                enabledFilters = Set(FilterCategory.allCases)
-            }
+            enabledFilters = Set(FilterCategory.allCases)
         }
         Task { await rebuildAndReload() }
     }
 
     // MARK: - Extension Status
 
-    func checkExtensionStatus() async {
+    @discardableResult
+    func checkExtensionStatus() async -> Bool? {
         #if os(iOS)
         do {
             let state = try await SFContentBlockerManager.stateOfContentBlocker(
                 withIdentifier: Self.extensionBundleIdentifier
             )
-            await MainActor.run { isExtensionEnabled = state.isEnabled }
+            let enabled = state.isEnabled
+            await MainActor.run {
+                isExtensionEnabled = enabled
+                if !enabled {
+                    deactivateProtectionIfNeeded()
+                }
+            }
+            return enabled
         } catch {
-            await MainActor.run { isExtensionEnabled = false }
+            return nil
         }
+        #else
+        return nil
         #endif
     }
 
     // MARK: - Filter Toggle
 
+    func deactivateProtectionIfNeeded() {
+        guard isProtectionActive else { return }
+        UserDefaults.standard.set(enabledFilters.map(\.rawValue), forKey: lastFiltersKey)
+        enabledFilters.removeAll()
+        Task { await rebuildAndReload() }
+    }
+
+    func enforceSubscriptionAccess() {
+        guard !SubscriptionManager.shared.isPremium else { return }
+        deactivateProtectionIfNeeded()
+    }
+
     func toggleFilter(_ category: FilterCategory, isOn: Bool) {
         if isOn {
+            guard SubscriptionManager.shared.isPremium else { return }
+            guard isExtensionEnabled else { return }
             enabledFilters.insert(category)
         } else {
             enabledFilters.remove(category)
@@ -143,8 +174,11 @@ final class ContentBlockerManager {
         }
 
         for domain in blockedWebsites {
+            let pattern = domain
+                .replacingOccurrences(of: ".", with: "\\.")
+                + "\\."
             let rule: [String: Any] = [
-                "trigger": ["url-filter": ".*", "if-domain": ["*\(domain)"]],
+                "trigger": ["url-filter": pattern],
                 "action": ["type": "block"]
             ]
             allRules.append(rule)
@@ -159,11 +193,11 @@ final class ContentBlockerManager {
         }
 
         if allRules.isEmpty {
-            let emptyRule: [String: Any] = [
-                "trigger": ["url-filter": "^$"],
+            let noopRule: [String: Any] = [
+                "trigger": ["url-filter": "://never\\.match\\.this\\.domain\\.invalid"],
                 "action": ["type": "block"]
             ]
-            allRules.append(emptyRule)
+            allRules.append(noopRule)
         }
 
         return allRules

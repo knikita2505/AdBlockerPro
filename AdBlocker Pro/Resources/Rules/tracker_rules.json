@@ -1,146 +1,64 @@
 [
-  {
-    "trigger": { "url-filter": "google-analytics\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "googletagmanager\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "googletagservices\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "connect\\.facebook\\.net" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "pixel\\.facebook\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "analytics\\.twitter\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "static\\.ads-twitter\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "hotjar\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "mixpanel\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "cdn\\.mxpnl\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "segment\\.(com|io)" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "amplitude\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "nr-data\\.net" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "js-agent\\.newrelic\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "fullstory\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "mouseflow\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "clarity\\.ms" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "crazyegg\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "quantserve\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "quantcast\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "scorecardresearch\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "chartbeat\\.(com|net)" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "optimizely\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "tapad\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "liadm\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "bluekai\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "addthis\\.com" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "demdex\\.net" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "omtrdc\\.net" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "2o7\\.net" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "everesttech\\.net" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "branch\\.io" },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "adjust\\.com", "resource-type": ["script", "raw"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "appsflyer\\.com", "resource-type": ["script", "raw"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "bugsnag\\.com", "resource-type": ["script", "raw"] },
-    "action": { "type": "block" }
-  },
-  {
-    "trigger": { "url-filter": "sentry\\.io", "resource-type": ["script", "raw"] },
-    "action": { "type": "block" }
-  }
+  {"trigger":{"url-filter":"google-analytics\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"googletagmanager\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"googletagservices\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"googlesyndication\\.com\\/pagead\\/conversion"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"connect\\.facebook\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pixel\\.facebook\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"graph\\.facebook\\..*\\/activities"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"analytics\\.twitter\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"static\\.ads-twitter\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"t\\.co\\/i\\/adsct"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"snap\\.licdn\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"px\\.ads\\.linkedin\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"ct\\.pinterest\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"analytics\\.tiktok\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"hotjar\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"mixpanel\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"cdn\\.mxpnl\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"segment\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"api\\.segment\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"amplitude\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"nr-data\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"js-agent\\.newrelic\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bam\\.nr-data\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"fullstory\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"mouseflow\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"clarity\\.ms"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"crazyegg\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"quantserve\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"quantcast\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"scorecardresearch\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"chartbeat\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"optimizely\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tapad\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"liadm\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bluekai\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"addthis\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"demdex\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"omtrdc\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"2o7\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"everesttech\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"branch\\.io","resource-type":["script","raw"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"adjust\\.","resource-type":["script","raw"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"appsflyer\\.","resource-type":["script","raw"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"sentry\\.io","resource-type":["script","raw"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bugsnag\\.","resource-type":["script","raw"]},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"heap\\.io"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"heapanalytics\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"pendo\\.io"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"intercom\\.io\\/widget"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"mc\\.yandex\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"metrika\\.yandex\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"top-fwz1\\.mail\\.ru"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"top\\.mail\\.ru"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"vk\\.com\\/rtrg"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"counter\\.yadro\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"matomo\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"plausible\\.io\\/api"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"clicky\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"statcounter\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"doubleclick\\..*\\/pixel"},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"bat\\.bing\\."},"action":{"type":"block"}},
+  {"trigger":{"url-filter":"tr\\.snapchat\\."},"action":{"type":"block"}}
 ]

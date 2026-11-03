@@ -10,15 +10,10 @@ struct NetworkCheckView: View {
             ScrollView {
                 VStack(spacing: AppTheme.spacingL) {
                     headerSection
-
                     heroSection
 
-                    if !service.isScanning {
-                        scanButton
-                    }
-
                     if service.isScanning {
-                        scanProgressCard
+                        scanProgressBar
                     }
 
                     if service.scanComplete {
@@ -26,167 +21,142 @@ struct NetworkCheckView: View {
                         resultsSection
                     }
 
-                    Spacer(minLength: 100)
+                    Spacer(minLength: 40)
                 }
                 .padding(.horizontal, AppTheme.spacingM)
-                .padding(.vertical, AppTheme.spacingM)
+                .padding(.top, AppTheme.spacingS)
             }
             .background(GradientBackground())
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(true)
+            .onChange(of: service.scanComplete) { _, completed in
+                guard completed else { return }
+                Task { await AdPresentationService.shared.showAfterScanIfNeeded() }
+            }
         }
     }
 
     // MARK: - Header
 
     private var headerSection: some View {
-        VStack(spacing: AppTheme.spacingXS) {
-            Text(String(localized: "Network Privacy"))
-                .font(AppTheme.titleFont)
-                .foregroundStyle(AppTheme.primaryText)
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(String(localized: "Network Privacy"))
+                    .font(AppTheme.titleFont)
+                    .foregroundStyle(AppTheme.primaryText)
 
-            Text(String(localized: "Analyze your connection security"))
-                .font(AppTheme.bodyFont)
-                .foregroundStyle(AppTheme.secondaryText)
+                Text(String(localized: "Analyze your connection security"))
+                    .font(AppTheme.bodyFont)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+
+            Spacer()
+
+            ProBadgeButton()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, AppTheme.spacingS)
     }
 
     // MARK: - Hero
 
-    @ViewBuilder
     private var heroSection: some View {
-        ZStack {
-            Circle()
-                .stroke(
-                    AppTheme.accent.opacity(0.06),
-                    lineWidth: 2
-                )
-                .frame(width: 200, height: 200)
-
-            Circle()
-                .stroke(
-                    AppTheme.accent.opacity(0.10),
-                    lineWidth: 3
-                )
-                .frame(width: 160, height: 160)
-
-            Circle()
-                .stroke(
-                    AppTheme.accent.opacity(0.15),
-                    lineWidth: 4
-                )
-                .frame(width: 120, height: 120)
-
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 88, height: 88)
-                .shadow(color: AppTheme.accent.opacity(0.3), radius: 16, y: 6)
-
-            Image(systemName: heroIcon)
-                .font(.system(size: 36, weight: .medium, design: .rounded))
-                .foregroundStyle(.white)
-                .contentTransition(.symbolEffect(.replace))
-
-            if service.isScanning {
-                Circle()
-                    .trim(from: 0, to: 0.3)
-                    .stroke(
-                        AppTheme.accentLight.opacity(0.5),
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                    )
-                    .frame(width: 160, height: 160)
-                    .rotationEffect(.degrees(ringRotation))
-                    .onAppear {
-                        withAnimation(
-                            .linear(duration: 1.5)
-                            .repeatForever(autoreverses: false)
-                        ) {
-                            ringRotation = 360
-                        }
-                    }
-                    .onDisappear {
-                        ringRotation = 0
-                    }
-            }
-        }
-        .padding(.vertical, AppTheme.spacingS)
-
-        VStack(spacing: 6) {
-            Text(statusTitle)
-                .font(AppTheme.titleMedium)
-                .foregroundStyle(AppTheme.primaryText)
-
-            Text(statusSubtitle)
-                .font(AppTheme.captionFont)
-                .foregroundStyle(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppTheme.spacingM)
-        }
-    }
-
-    // MARK: - Scan Button
-
-    private var scanButton: some View {
-        Button {
-            HapticManager.impact(.medium)
-            service.startScan()
-        } label: {
-            Text(service.scanComplete
-                 ? String(localized: "Scan Again")
-                 : String(localized: "Start Scan"))
-                .font(AppTheme.bodyMedium)
-                .foregroundStyle(.white)
-                .padding(.horizontal, AppTheme.spacingXL)
-                .padding(.vertical, AppTheme.spacingM - 2)
-                .background(
-                    LinearGradient(
-                        colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .clipShape(Capsule())
-                .shadow(color: AppTheme.accent.opacity(0.25), radius: 8, y: 4)
-        }
-        .pressable()
-    }
-
-    // MARK: - Scan Progress
-
-    private var scanProgressCard: some View {
-        VStack(spacing: AppTheme.spacingM - 4) {
-            HStack {
-                HStack(spacing: AppTheme.spacingS) {
-                    ProgressView()
-                        .tint(AppTheme.accent)
-                        .scaleEffect(0.8)
-
-                    Text(String(localized: "Analyzing network..."))
-                        .font(AppTheme.bodyMedium)
-                        .foregroundStyle(AppTheme.primaryText)
+        VStack(spacing: AppTheme.spacingM) {
+            Button {
+                guard !service.isScanning else { return }
+                HapticManager.impact(.medium)
+                ringRotation = 0
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
+                    service.startScan()
                 }
+            } label: {
+                ZStack {
+                    Circle()
+                        .stroke(
+                            heroIsHighlighted
+                            ? AppTheme.accent.opacity(0.16)
+                            : Color.black.opacity(0.04),
+                            lineWidth: 10
+                        )
+                        .frame(width: 156, height: 156)
 
-                Spacer()
+                    Circle()
+                        .fill(
+                            heroIsHighlighted
+                            ? LinearGradient(
+                                colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            : LinearGradient(
+                                colors: [Color(hex: "E8ECF0"), Color(hex: "D5DBE2")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 120, height: 120)
+                        .shadow(
+                            color: heroIsHighlighted
+                            ? AppTheme.accent.opacity(0.32)
+                            : Color.black.opacity(0.08),
+                            radius: heroIsHighlighted ? 22 : 10,
+                            y: 8
+                        )
 
-                Text("\(Int(service.scanProgress * 100))%")
-                    .font(AppTheme.captionMedium)
-                    .foregroundStyle(AppTheme.accent)
+                    Image(systemName: heroIcon)
+                        .font(.system(size: 46, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white)
+                        .contentTransition(.symbolEffect(.replace))
+
+                    if service.isScanning {
+                        Circle()
+                            .trim(from: 0, to: 0.28)
+                            .stroke(
+                                Color.white.opacity(0.9),
+                                style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                            )
+                            .frame(width: 148, height: 148)
+                            .rotationEffect(.degrees(ringRotation))
+                            .onAppear {
+                                withAnimation(
+                                    .linear(duration: 1.2)
+                                    .repeatForever(autoreverses: false)
+                                ) {
+                                    ringRotation = 360
+                                }
+                            }
+                    }
+                }
             }
+            .buttonStyle(PressedStyle())
+            .accessibilityLabel(String(localized: "Start Scan"))
+            .disabled(service.isScanning)
 
+            VStack(spacing: 4) {
+                Text(statusTitle)
+                    .font(AppTheme.titleSmall)
+                    .foregroundStyle(AppTheme.primaryText)
+
+                Text(statusSubtitle)
+                    .font(AppTheme.captionFont)
+                    .foregroundStyle(heroIsHighlighted ? AppTheme.accent : AppTheme.tertiaryText)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppTheme.spacingS)
+    }
+
+    private var heroIsHighlighted: Bool {
+        service.isScanning || service.scanComplete
+    }
+
+    // MARK: - Progress
+
+    private var scanProgressBar: some View {
+        VStack(spacing: 8) {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: AppTheme.radiusFull)
+                    Capsule()
                         .fill(AppTheme.surfaceSecondary)
-                        .frame(height: 6)
-
-                    RoundedRectangle(cornerRadius: AppTheme.radiusFull)
+                    Capsule()
                         .fill(
                             LinearGradient(
                                 colors: [AppTheme.gradientStart, AppTheme.gradientEnd],
@@ -194,17 +164,17 @@ struct NetworkCheckView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .frame(
-                            width: geo.size.width * service.scanProgress,
-                            height: 6
-                        )
+                        .frame(width: max(8, geo.size.width * service.scanProgress))
                         .animation(.easeInOut(duration: 0.3), value: service.scanProgress)
                 }
             }
             .frame(height: 6)
+
+            Text("\(Int(service.scanProgress * 100))%")
+                .font(AppTheme.captionMedium)
+                .foregroundStyle(AppTheme.accent)
         }
-        .cardStyle()
-        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+        .padding(.horizontal, AppTheme.spacingXL)
     }
 
     // MARK: - Summary
@@ -224,11 +194,10 @@ struct NetworkCheckView: View {
             summaryColumn(
                 count: service.checks.filter { $0.status == .info }.count,
                 label: String(localized: "Info"),
-                color: .blue
+                color: Color(hex: "3B82F6")
             )
         }
         .cardStyle()
-        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     private func summaryColumn(count: Int, label: String, color: Color) -> some View {
@@ -253,25 +222,71 @@ struct NetworkCheckView: View {
     // MARK: - Results
 
     private var resultsSection: some View {
-        VStack(spacing: AppTheme.spacingS) {
-            ForEach(service.checks) { check in
-                checkRow(check)
+        VStack(alignment: .leading, spacing: AppTheme.spacingS) {
+            Text(String(localized: "Checks"))
+                .font(AppTheme.captionMedium)
+                .foregroundStyle(AppTheme.secondaryText)
+                .textCase(.uppercase)
+                .tracking(0.6)
+                .padding(.leading, AppTheme.spacingS)
+
+            VStack(spacing: 0) {
+                ForEach(Array(service.checks.enumerated()), id: \.element.id) { index, check in
+                    NetworkCheckRow(check: check)
+
+                    if index < service.checks.count - 1 {
+                        Divider()
+                            .padding(.leading, 62)
+                    }
+                }
             }
+            .cardStyle(padding: 0)
         }
-        .transition(.opacity)
     }
 
-    private func checkRow(_ check: PrivacyCheck) -> some View {
-        HStack(spacing: AppTheme.spacingM) {
-            ZStack {
-                RoundedRectangle(cornerRadius: AppTheme.radiusM, style: .continuous)
-                    .fill(check.status.color.opacity(0.10))
-                    .frame(width: 44, height: 44)
+    // MARK: - Computed
 
-                Image(systemName: check.icon)
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(check.status.color)
-            }
+    private var heroIcon: String {
+        if service.isScanning { return "wifi" }
+        if !service.scanComplete { return "wifi" }
+        let warnings = service.checks.filter { $0.status == .warning }.count
+        return warnings > 0 ? "wifi.exclamationmark" : "checkmark.shield.fill"
+    }
+
+    private var statusTitle: String {
+        if service.isScanning { return String(localized: "Scanning Network") }
+        if !service.scanComplete { return String(localized: "Ready to Scan") }
+        let warnings = service.checks.filter { $0.status == .warning }.count
+        if warnings > 1 { return String(localized: "Improvements Suggested") }
+        if warnings == 1 { return String(localized: "Mostly Secure") }
+        return String(localized: "Network is Secure")
+    }
+
+    private var statusSubtitle: String {
+        if service.isScanning { return String(localized: "Checking Wi-Fi, VPN, DNS and internet…") }
+        if !service.scanComplete { return String(localized: "Tap the button to check this network") }
+        let warnings = service.checks.filter { $0.status == .warning }.count
+        if warnings > 0 {
+            return String(localized: "\(warnings) potential issue(s) found")
+        }
+        return String(localized: "All checks passed successfully")
+    }
+}
+
+// MARK: - Row
+
+private struct NetworkCheckRow: View {
+    let check: PrivacyCheck
+    @State private var showTooltip = false
+
+    var body: some View {
+        HStack(alignment: .center, spacing: AppTheme.spacingM) {
+            Image(systemName: check.icon)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(width: 30, height: 30)
+                .background(check.status.color)
+                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(check.title)
@@ -281,44 +296,35 @@ struct NetworkCheckView: View {
                 Text(check.subtitle)
                     .font(AppTheme.captionFont)
                     .foregroundStyle(AppTheme.secondaryText)
-                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer()
+            Button {
+                showTooltip = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.tertiaryText)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
 
             Image(systemName: check.status.iconName)
                 .font(.system(size: 18, weight: .medium))
                 .foregroundStyle(check.status.color)
         }
-        .cardStyle()
-    }
-
-    // MARK: - Computed
-
-    private var heroIcon: String {
-        if service.isScanning { return "wifi" }
-        if !service.scanComplete { return "wifi" }
-        let warnings = service.checks.filter { $0.status == .warning }.count
-        return warnings > 1 ? "wifi.exclamationmark" : "checkmark.shield.fill"
-    }
-
-    private var statusTitle: String {
-        if service.isScanning { return String(localized: "Scanning Network") }
-        if !service.scanComplete { return String(localized: "Network Privacy") }
-        let warnings = service.checks.filter { $0.status == .warning }.count
-        if warnings > 1 { return String(localized: "Improvements Suggested") }
-        if warnings == 1 { return String(localized: "Mostly Secure") }
-        return String(localized: "Network is Secure")
-    }
-
-    private var statusSubtitle: String {
-        if service.isScanning { return String(localized: "Checking connection, VPN, DNS, HTTPS...") }
-        if !service.scanComplete { return String(localized: "Analyze your network privacy and security") }
-        let warnings = service.checks.filter { $0.status == .warning }.count
-        if warnings > 0 {
-            return String(localized: "\(warnings) potential issue(s) found")
+        .padding(.horizontal, AppTheme.spacingM)
+        .padding(.vertical, 12)
+        .sheet(isPresented: $showTooltip) {
+            InfoTipSheet(
+                icon: check.icon,
+                iconColor: check.status.color,
+                title: check.title,
+                message: check.tooltip
+            )
         }
-        return String(localized: "All checks passed successfully")
     }
 }
 

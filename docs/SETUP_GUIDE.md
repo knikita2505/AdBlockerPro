@@ -1,82 +1,58 @@
 # AdBlocker Pro — Инструкция по настройке
 
-## 1. Добавление Safari Content Blocker Extension в Xcode
+## 1. Safari Content Blocker
 
-Cursor не может создать extension target — это нужно сделать вручную:
+Таргет `ContentBlockerExtension`, bundle `nikita.ka.AdBlocker-Pro.ContentBlockerExtension`, App Group `group.nikita.ka.AdBlocker-Pro.ContentBlockerExt`. Display name расширения: **AdBlocker Pro**.
 
-### Шаги:
+## 2. SDK (SPM)
 
-1. Открой проект в **Xcode**
-2. **File → New → Target...**
-3. Выбери **Content Blocker Extension**
-4. Назови: `ContentBlockerExtension`
-5. Bundle Identifier: `nikita.ka.AdBlocker-Pro.ContentBlocker`
-6. Language: Swift
-7. **Finish**
+Уже добавлены в проект:
 
-### После создания:
+| SDK | URL | Product |
+|-----|-----|---------|
+| Apphud | https://github.com/apphud/ApphudSDK | ApphudSDK |
+| AppsFlyer | https://github.com/AppsFlyerSDK/AppsFlyerFramework-Dynamic | AppsFlyerLib-Dynamic |
+| AdMob | https://github.com/googleads/swift-package-manager-google-mobile-ads.git | GoogleMobileAds |
+| AppMetrica | https://github.com/appmetrica/appmetrica-sdk-ios | AppMetricaCore, AppMetricaAnalytics, AppMetricaAdSupport |
 
-8. **Удали** автоматически созданный `blockerList.json` из extension target
-9. **Удали** автоматически созданный `ContentBlockerRequestHandler.swift` из extension target
-10. **Подключи** файл `ContentBlockerExtension/ContentBlockerRequestHandler.swift` из проекта к extension target
+Порядок старта в `AdBlocker_ProApp.init`: **Apphud → AppsFlyer.configure → AppMetrica.activate**.
 
-## 2. Настройка App Groups
+## 3. Ключи — `SDKConfig.swift` и `PaywallConstants`
 
-### Для обоих таргетов (AdBlocker Pro и ContentBlockerExtension):
+Ключи SDK и AdMob App ID заданы в `SDKConfig.swift` / `AdMobConfig` и `Info.plist`.
 
-1. Выбери таргет в **Signing & Capabilities**
-2. Нажми **+ Capability**
-3. Добавь **App Groups**
-4. Создай группу: `group.nikita.ka.AdBlocker-Pro`
-5. Убедись, что группа включена для **обоих** таргетов
+Перед релизом проверь:
 
-## 3. Добавление ApphudSDK через SPM
+- `PaywallConstants.termsURL` — `https://safeguard-adblock.app/TermsConditions.html`
+- `PaywallConstants.privacyURL` — `https://safeguard-adblock.app/PrivacyPolicy.html`
+- `PaywallConstants.supportEmail` — `support@safeguard-adblock.app`
+- Product IDs: `safeguard_premium_week`, `safeguard_premium_year`
+- Interstitial всегда боевой unit ID, и в Debug, и в Release
 
-1. **File → Add Package Dependencies...**
-2. URL: `https://github.com/apphud/ApphudSDK`
-3. Version: **Up to Next Major** (минимум 4.0.2)
-4. Добавь к таргету **AdBlocker Pro**
+## 4. Apphud Dashboard
 
-## 4. Настройка API ключей
+1. Products: `safeguard_premium_week`, `safeguard_premium_year`
+2. Paywalls: `safeguard_launch`, `safeguard_premium_features`
+3. Placements с теми же идентификаторами: `safeguard_launch` (launch paywall), `safeguard_premium_features` (premium paywall)
 
-### Apphud:
-Открой `AdBlocker_ProApp.swift` и замени `YOUR_APPHUD_API_KEY` на свой ключ из Apphud Dashboard.
+## 5. Запуск
 
-### Подписки:
-Открой `PaywallView.swift` и замени product IDs в `PaywallConstants`:
-- `adblocker.premium.week1` — недельная подписка
-- `adblocker.premium.year1` — годовая подписка
+Первый запуск без подписки: онбординг. ATT — после предпоследнего экрана. Get Started открывает экран «Preparing the blocker» в стиле launch paywall: короткая анимация, пока `PaywallViewModel.preload()` забирает цену и trial из StoreKit. Затем галочка и тот же экран переходит в `PaywallView`. Следующие холодные старты без подписки: сразу пейволл, без экрана подготовки. С подпиской пейволл не показывается.
 
-### Ссылки:
-Замени URLs в `PaywallConstants`:
-- `termsURL` — ссылка на Terms of Use
-- `privacyURL` — ссылка на Privacy Policy
+Онбординг показывается один раз. Премиум-функции (щит, фильтры, сохранённые пароли, плашка PRO) открывают `PremiumPaywallView`.
 
-## 5. Настройка Info.plist
+Инструкция Safari — один раз и только если content blocker выключен.
 
-Добавь ключ `NSFaceIDUsageDescription` в Info.plist (через Build Settings → Info):
-```
-NSFaceIDUsageDescription: "AdBlocker Pro uses Face ID to protect your saved passwords"
-```
+## 6. Реклама
 
-## 6. Локализация
+Interstitial AdMob после: скана сети, каждого Generate и dismiss пейволла. Форма UMP запрашивается только после закрытия первого (launch) пейволла, внутри `InterstitialAdService.show()`. Premium — без рекламы.
 
-Проект поддерживает: EN (базовый), ES, DE, FR, JA.
+## 7. Локализация
 
-В настройках проекта:
-1. **Project → Info → Localizations**
-2. Добавь: Spanish, German, French, Japanese
-3. `Localizable.xcstrings` уже содержит переводы
-
-## 7. Apphud Dashboard
-
-Создай в Apphud:
-1. **Products**: `adblocker.premium.week1`, `adblocker.premium.year1`
-2. **Paywalls**: настрой paywall с этими products
-3. **Placements**: `onboarding`, `premium_feature`
+EN / ES / JA / pt-BR. UI: `Localizable.xcstrings`. Face ID и ATT: `InfoPlist.xcstrings`.
 
 ## 8. App Store Connect
 
-1. Создай подписки в App Store Connect с теми же product IDs
-2. Настрой Trial period для weekly если нужно
-3. Заполни описания подписок
+1. Подписки с теми же product IDs. Trial и цена на пейволле берутся из StoreKit, не из текста в приложении.
+2. Privacy Nutrition Labels по `PrivacyInfo.xcprivacy`
+3. Review Notes: блокировка только в Safari после включения content blocker; реклама только внутри приложения

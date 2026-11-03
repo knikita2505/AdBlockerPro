@@ -32,9 +32,26 @@ final class AppState {
     var hasCompletedOnboarding: Bool {
         didSet { UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding") }
     }
-    var showPaywall = false
+    var showSafariSetupGuide = false
+    var pendingSafariSetupAfterPaywall = false
+    var hasShownSafariSetupAfterOnboarding: Bool {
+        didSet { UserDefaults.standard.set(hasShownSafariSetupAfterOnboarding, forKey: Self.safariSetupKey) }
+    }
+
+    private static let safariSetupKey = "hasShownSafariSetupAfterOnboarding"
 
     private init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        self.hasShownSafariSetupAfterOnboarding = UserDefaults.standard.bool(forKey: Self.safariSetupKey)
+    }
+
+    @MainActor
+    func presentSafariSetupIfNeeded() async {
+        guard !hasShownSafariSetupAfterOnboarding else { return }
+        let enabled = await ContentBlockerManager.shared.checkExtensionStatus()
+        hasShownSafariSetupAfterOnboarding = true
+        guard enabled == false else { return }
+        try? await Task.sleep(for: .milliseconds(400))
+        showSafariSetupGuide = true
     }
 }

@@ -285,7 +285,7 @@ struct PasswordDetailView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 18))
                     .foregroundStyle(AppTheme.accent)
-                Text("\(copiedField) copied")
+                Text(String(localized: "\(copiedField) copied"))
                     .font(AppTheme.captionMedium)
                     .foregroundStyle(AppTheme.accent)
             }
