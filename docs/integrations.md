@@ -8,7 +8,7 @@
 
 После ATT: `Apphud.setDeviceIdentifiers(idfa:idfv:)`.
 
-UMP (`ConsentService`) → `MobileAds.start` + `InterstitialAdService.preload`, только если `canRequestAds` и не premium.
+UMP (`ConsentService`) запрашивается после закрытия первого launch-пейволла, затем `MobileAds.start` + `InterstitialAdService.preload`, только если `canRequestAds` и не premium.
 
 ## События рекламы
 

@@ -20,9 +20,6 @@ struct MainTabView: View {
             }
         }
         .tint(AppTheme.accent)
-        .task {
-            await ConsentService.shared.prepareAdsAfterTrackingDecision()
-        }
         .fullScreenCover(isPresented: $subscriptionManager.showPaywall, onDismiss: {
             Task { await handlePaywallDismissed() }
         }) {

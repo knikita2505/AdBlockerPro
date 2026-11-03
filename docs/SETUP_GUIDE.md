@@ -23,7 +23,9 @@
 
 Перед релизом проверь:
 
-- `PaywallConstants.termsURL`, `privacyURL`, `supportEmail` — живые страницы, не заглушки
+- `PaywallConstants.termsURL` — `https://safeguard-adblock.app/TermsConditions.html`
+- `PaywallConstants.privacyURL` — `https://safeguard-adblock.app/PrivacyPolicy.html`
+- `PaywallConstants.supportEmail` — `support@safeguard-adblock.app`
 - Product IDs: `safeguard_premium_week`, `safeguard_premium_year`
 - Interstitial всегда боевой unit ID, и в Debug, и в Release
 
@@ -35,15 +37,15 @@
 
 ## 5. Запуск
 
-Каждый холодный старт без подписки: анимация настройки → ATT (если ещё не решён) → UMP → launch paywall (`PaywallView`). С подпиской анимация и пейволл не показываются.
+Первый запуск без подписки: онбординг. ATT — после предпоследнего экрана. Get Started открывает экран «Preparing the blocker» в стиле launch paywall: короткая анимация, пока `PaywallViewModel.preload()` забирает цену и trial из StoreKit. Затем галочка и тот же экран переходит в `PaywallView`. Следующие холодные старты без подписки: сразу пейволл, без экрана подготовки. С подпиской пейволл не показывается.
 
-Онбординга нет. Премиум-функции (щит, фильтры, вкладка Passwords, плашка PRO) открывают `PremiumPaywallView`.
+Онбординг показывается один раз. Премиум-функции (щит, фильтры, сохранённые пароли, плашка PRO) открывают `PremiumPaywallView`.
 
 Инструкция Safari — один раз и только если content blocker выключен.
 
 ## 6. Реклама
 
-Interstitial AdMob после: скана сети, каждого Generate и dismiss пейволла. Premium — без рекламы.
+Interstitial AdMob после: скана сети, каждого Generate и dismiss пейволла. Форма UMP запрашивается только после закрытия первого (launch) пейволла, внутри `InterstitialAdService.show()`. Premium — без рекламы.
 
 ## 7. Локализация
 
@@ -51,6 +53,6 @@ EN / ES / JA / pt-BR. UI: `Localizable.xcstrings`. Face ID и ATT: `InfoPlist.xc
 
 ## 8. App Store Connect
 
-1. Подписки с теми же product IDs, trial weekly 3 дня — как на пейволле
+1. Подписки с теми же product IDs. Trial и цена на пейволле берутся из StoreKit, не из текста в приложении.
 2. Privacy Nutrition Labels по `PrivacyInfo.xcprivacy`
 3. Review Notes: блокировка только в Safari после включения content blocker; реклама только внутри приложения

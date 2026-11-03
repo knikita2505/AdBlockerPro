@@ -23,9 +23,11 @@ final class PaywallViewModel {
     private var yearlyStoreProduct: Product?
     var isTrialEligible = false
     var isLoadingProducts = true
+    private(set) var didFinishLoading = false
     var loadingError: PaywallError?
 
     private var currentPaywall: ApphudPaywall?
+    private var loadingTask: Task<Void, Never>?
 
     init(placement: PaywallPlacement = .launch) {
         self.placement = placement
@@ -48,16 +50,24 @@ final class PaywallViewModel {
     var weeklyCardPrice: String? {
         guard let product = weeklyStoreProduct else { return nil }
         let price = pricePerPeriod(product)
-        guard weeklyShowsTrial else { return price }
-        return String(format: String(localized: "Then %@"), price)
+        guard weeklyShowsTrial, let period = product.subscription?.introductoryOffer?.period else {
+            return price
+        }
+        let trial = freeTrialTitle(period)
+        let thenPrice = String(format: String(localized: "Then %@"), price)
+        return "\(trial), \(thenPrice)"
     }
 
     var trialPriceLine: String {
-        guard let product = weeklyStoreProduct else {
-            return String(localized: "First 3 days free")
-        }
+        guard let product = weeklyStoreProduct else { return "" }
         let price = pricePerPeriod(product)
-        return String(format: String(localized: "First 3 days free, then %@"), price)
+        if weeklyShowsTrial, let period = product.subscription?.introductoryOffer?.period {
+            let trial = freeTrialTitle(period)
+            let thenPrice = String(format: String(localized: "Then %@"), price)
+            return "\(trial), \(thenPrice)"
+        }
+        let name = storeDisplayName(apphud: weeklyProduct, store: product)
+        return name.isEmpty ? price : "\(name) · \(price)"
     }
 
     private var weeklyShowsTrial: Bool {
@@ -76,11 +86,26 @@ final class PaywallViewModel {
     }
 
     func onAppear() {
-        loadProducts()
+        Task { await preload() }
     }
 
     func retryLoadProducts() {
-        loadProducts()
+        loadingTask = nil
+        didFinishLoading = false
+        Task { await preload() }
+    }
+
+    @MainActor
+    func preload() async {
+        if let loadingTask {
+            await loadingTask.value
+            return
+        }
+        let task = Task { @MainActor in
+            await self.performLoad()
+        }
+        loadingTask = task
+        await task.value
     }
 
     func select(_ plan: PaywallSubscriptionPlan) {
@@ -123,16 +148,19 @@ final class PaywallViewModel {
         }
     }
 
-    private func loadProducts() {
+    @MainActor
+    private func performLoad() async {
         isLoadingProducts = true
+        didFinishLoading = false
         loadingError = nil
 
-        Apphud.fetchPlacements(forceRefresh: true) { [weak self] placements, error in
-            let failureMessage = error?.localizedDescription
-            Task { @MainActor [weak self] in
-                await self?.applyPlacements(placements, errorMessage: failureMessage)
+        let (placements, errorMessage) = await withCheckedContinuation { continuation in
+            Apphud.fetchPlacements(forceRefresh: true) { placements, error in
+                continuation.resume(returning: (placements, error?.localizedDescription))
             }
         }
+        await applyPlacements(placements, errorMessage: errorMessage)
+        didFinishLoading = true
     }
 
     @MainActor
@@ -260,6 +288,33 @@ final class PaywallViewModel {
         return "\(price)/\(unit)"
     }
 
+    private func freeTrialTitle(_ period: Product.SubscriptionPeriod) -> String {
+        switch period.unit {
+        case .day:
+            let key = period.value == 1
+                ? String(localized: "%d-Day Free Trial")
+                : String(localized: "%d-Days Free Trial")
+            return String(format: key, period.value)
+        case .week:
+            let key = period.value == 1
+                ? String(localized: "%d-Week Free Trial")
+                : String(localized: "%d-Weeks Free Trial")
+            return String(format: key, period.value)
+        case .month:
+            let key = period.value == 1
+                ? String(localized: "%d-Month Free Trial")
+                : String(localized: "%d-Months Free Trial")
+            return String(format: key, period.value)
+        case .year:
+            let key = period.value == 1
+                ? String(localized: "%d-Year Free Trial")
+                : String(localized: "%d-Years Free Trial")
+            return String(format: key, period.value)
+        @unknown default:
+            return String(localized: "Free Trial")
+        }
+    }
+
     private func unitWord(_ period: Product.SubscriptionPeriod) -> String {
         switch period.unit {
         case .day:
@@ -322,7 +377,7 @@ enum PaywallError {
 enum PaywallConstants {
     static let weeklyProductId = "safeguard_premium_week"
     static let yearlyProductId = "safeguard_premium_year"
-    static let termsURL = "https://adblockerpro.app/terms.html"
-    static let privacyURL = "https://adblockerpro.app/privacy.html"
-    static let supportEmail = "support@adblockerpro.app"
+    static let termsURL = "https://safeguard-adblock.app/TermsConditions.html"
+    static let privacyURL = "https://safeguard-adblock.app/PrivacyPolicy.html"
+    static let supportEmail = "support@safeguard-adblock.app"
 }

@@ -256,9 +256,14 @@ struct SettingsView: View {
             } label: {
                 HStack(spacing: AppTheme.spacingM) {
                     settingsIcon(name: "envelope.fill", color: AppTheme.accent)
-                    Text(String(localized: "Contact Support"))
-                        .font(AppTheme.bodyFont)
-                        .foregroundStyle(AppTheme.primaryText)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String(localized: "Contact Support"))
+                            .font(AppTheme.bodyFont)
+                            .foregroundStyle(AppTheme.primaryText)
+                        Text(PaywallConstants.supportEmail)
+                            .font(AppTheme.captionFont)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 14, weight: .semibold))

@@ -3,9 +3,9 @@
 ## Блокеры перед отправкой
 
 - [ ] Убран вечный Premium (`Apphud.hasActiveSubscription()` без `true ||`) — уже в коде
-- [ ] Живые Terms / Privacy / support в `PaywallConstants` (сейчас заглушки `adblockerpro.app`)
+- [x] Живые Terms / Privacy / support в `PaywallConstants`: `https://safeguard-adblock.app/TermsConditions.html`, `https://safeguard-adblock.app/PrivacyPolicy.html`, `support@safeguard-adblock.app`
 - [x] Боевые ключи AppsFlyer, AppMetrica, AdMob в `SDKConfig` / `AdMobConfig` / Info.plist
-- [ ] Trial на weekly совпадает с introductory offer в App Store Connect. На пейволле срок и цена берутся из Apphud / StoreKit, не зашиты в текст
+- [x] Trial на weekly берётся из introductory offer StoreKit. Срок и цена не зашиты в текст
 - [ ] Restore: launch paywall, «Already Purchase?» на premium, Settings
 
 ## Guideline 3.1.2
@@ -18,7 +18,7 @@ Premium-пейволл: название продукта из Apphud, цена 
 
 ## Guideline 5.1.1
 
-ATT запрашивается на экране настройки при запуске, до рекламы и IDFA. Строка: `NSUserTrackingUsageDescription` (локализована).
+ATT запрашивается после предпоследнего экрана онбординга. Если пользователь нажал Skip до ATT, запрос идёт на экране подготовки. Форма Google Ads (UMP) — только после закрытия первого launch-пейволла. Строка ATT: `NSUserTrackingUsageDescription` (локализована, текст не менять).
 
 ## Guideline 5.1.2
 

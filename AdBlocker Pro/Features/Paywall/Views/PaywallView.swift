@@ -10,10 +10,16 @@ struct PaywallView: View {
     @State private var pulse = false
 
     let placement: PaywallPlacement
+    private let onDismissed: (() -> Void)?
 
-    init(placement: PaywallPlacement = .launch) {
+    init(
+        placement: PaywallPlacement = .launch,
+        viewModel: PaywallViewModel? = nil,
+        onDismissed: (() -> Void)? = nil
+    ) {
         self.placement = placement
-        self._vm = State(wrappedValue: PaywallViewModel(placement: placement))
+        self.onDismissed = onDismissed
+        self._vm = State(wrappedValue: viewModel ?? PaywallViewModel(placement: placement))
     }
 
     private let features: [(color: Color, icon: String, title: String, subtitle: String)] = [
@@ -50,7 +56,7 @@ struct PaywallView: View {
             VStack(spacing: 0) {
                 HStack {
                     Spacer()
-                    Button { dismiss() } label: {
+                    Button { close() } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(Color.black.opacity(0.08))
@@ -74,10 +80,12 @@ struct PaywallView: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 12)
 
-                        Text(vm.trialPriceLine)
-                            .font(AppTheme.bodyFont)
-                            .foregroundStyle(AppTheme.tertiaryText)
-                            .multilineTextAlignment(.center)
+                        if !vm.trialPriceLine.isEmpty {
+                            Text(vm.trialPriceLine)
+                                .font(AppTheme.bodyFont)
+                                .foregroundStyle(AppTheme.tertiaryText)
+                                .multilineTextAlignment(.center)
+                        }
 
                         VStack(alignment: .leading, spacing: 16) {
                             ForEach(Array(features.enumerated()), id: \.offset) { _, item in
@@ -150,13 +158,21 @@ struct PaywallView: View {
         .onChange(of: vm.purchaseSuccessful) { _, success in
             if success {
                 SubscriptionManager.shared.handleSuccessfulPurchase()
-                dismiss()
+                close()
             }
         }
         .alert(String(localized: "Purchase Failed"), isPresented: $vm.showError) {
             Button(String(localized: "OK"), role: .cancel) {}
         } message: {
             Text(vm.errorMessage ?? String(localized: "Something went wrong."))
+        }
+    }
+
+    private func close() {
+        if let onDismissed {
+            onDismissed()
+        } else {
+            dismiss()
         }
     }
 

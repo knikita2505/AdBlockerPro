@@ -1,4 +1,3 @@
-import AppTrackingTransparency
 import Foundation
 import GoogleMobileAds
 import UIKit
@@ -12,11 +11,6 @@ final class ConsentService {
     private var isPreparing = false
 
     private init() {}
-
-    func prepareAdsAfterTrackingDecision() async {
-        guard ATTrackingManager.trackingAuthorizationStatus != .notDetermined else { return }
-        await prepareAdsIfNeeded()
-    }
 
     func prepareAdsIfNeeded() async {
         guard !SubscriptionManager.shared.isPremium else { return }
